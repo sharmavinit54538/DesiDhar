@@ -3,9 +3,17 @@
 @import "tailwindcss/utilities";
 
 @layer base {
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+  }
+
   html {
     scroll-behavior: smooth;
     font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -14,13 +22,48 @@
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
+  }
+
+  #root {
+    overflow-x: hidden;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Poppins', sans-serif;
     color: #4A2C17;
   }
+
+  /* Prevent auto-zoom on iOS when tapping inputs */
+  @media (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Safe area utilities */
+.safe-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+.safe-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Touch friendly minimum tap target */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* Custom scrollbars */

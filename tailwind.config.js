@@ -5,7 +5,28 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      'xs': '360px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1440px',
+      '3xl': '1920px',
+    },
     extend: {
+      height: {
+        'screen-dvh': '100dvh',
+      },
+      minHeight: {
+        'screen-dvh': '100dvh',
+      },
+      maxHeight: {
+        'screen-dvh': '100dvh',
+      },
+      maxWidth: {
+        'content': '1440px',
+      },
       colors: {
         brand: {
           50: '#FFFDF7',

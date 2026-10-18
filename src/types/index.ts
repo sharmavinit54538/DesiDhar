@@ -7,33 +7,189 @@ export interface ProductVariant {
   mrp: number;
   stock: number;
   sku: string;
+  piecesPerPack?: number;
+  weightInGrams?: number;
+  isDefault?: boolean;
+}
+
+export interface ProductImage {
+  id: string;
+  src: string;
+  srcset?: string;
+  sizes?: string;
+  alt: string;
+  type: 'main' | 'closeup' | 'packaging' | 'serving' | 'size-reference' | 'placeholder';
+  isMain: boolean;
+  order: number;
+  width: number;
+  height: number;
+  attribution?: ImageAttribution;
+}
+
+export interface ImageAttribution {
+  source: 'unsplash' | 'pexels' | 'pixabay' | 'local';
+  photographer: string;
+  photographerUrl?: string;
+  license: string;
+  originalUrl: string;
+  downloadedAt: string;
+}
+
+export interface NutritionalInfo {
+  energyKcal: number;
+  protein: number;
+  carbohydrates: number;
+  sugars: number;
+  fat: number;
+  saturatedFat: number;
+  transFat: number;
+  sodium: number;
+  fiber?: number;
+  cholesterol?: number;
+  servingSize: string;
+  servingSizeGrams: number;
+  isSampleData: boolean;
+}
+
+export interface Ingredient {
+  name: string;
+  percentage?: number;
+  isAllergen: boolean;
+  allergenType?: 'milk' | 'nuts' | 'gluten' | 'egg' | 'soy' | 'sulphites' | 'mustard' | 'sesame' | 'celery' | 'lupin' | 'molluscs' | 'crustaceans' | 'fish';
+}
+
+export interface AllergenInfo {
+  contains: string[];
+  mayContain: string[];
+  freeFrom: string[];
+}
+
+export interface DietaryTags {
+  isVeg: boolean;
+  isEggless: boolean;
+  isSugarFree: boolean;
+  isLowSugar: boolean;
+  isJainFriendly: boolean;
+  isFastingFriendly: boolean;
+  isOrganic: boolean;
+  isA2: boolean;
+  isHandmade: boolean;
+  isNoAddedSugar: boolean;
+  badges: string[];
+}
+
+export interface RegulatoryInfo {
+  fssaiLicenseNumber: string;
+  fssaiLicenseNumberIsSample: boolean;
+  manufacturerName: string;
+  manufacturerAddress: string;
+  packedBy?: string;
+  marketedBy?: string;
+  countryOfOrigin: string;
+  batchNumber: string;
+  manufacturingDate: string;
+  expiryDate: string;
+  netWeight: string;
+  grossWeight: string;
+  packagingType: 'box' | 'tin' | 'pouch' | 'jar' | 'bottle' | 'handi' | 'can' | 'carton';
+  vegSymbol: boolean;
+  mrpInclusiveOfTaxes: boolean;
+  hsnCode: string;
+  gstRate: number;
+  gstRateIsSample: boolean;
+}
+
+export interface StorageInfo {
+  shelfLifeDays: number;
+  shelfLifeText: string;
+  bestBeforeDaysFromManufacture: number;
+  storageInstructions: string;
+  servingSuggestion: string;
+  temperatureMin?: number;
+  temperatureMax?: number;
+  requiresRefrigeration: boolean;
+  coldChainRequired: boolean;
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
+  category?: string;
+}
+
+export interface Review {
+  id: string;
+  productId: string;
+  userName: string;
+  userLocation: string;
+  rating: number;
+  date: string;
+  comment: string;
+  verifiedPurchase: boolean;
+  helpfulCount: number;
+  reviewImages?: string[];
+}
+
+export interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string[];
+  slug: string;
+  ogImage: string;
+  ogTitle?: string;
+  ogDescription?: string;
+}
+
+export interface DeliveryInfo {
+  isPerishable: boolean;
+  coldChainRequired: boolean;
+  estimatedDeliveryDays: string;
+  returnPolicy: string;
+  nonReturnableOnceOpened: boolean;
+}
+
+export interface ProductHighlight {
+  text: string;
+  icon?: string;
 }
 
 export interface Product {
   id: string;
   slug: string;
   name: string;
+  hindiName: string;
   brand: string;
   category: string;
-  subcategory?: string;
-  images: string[];
+  subcategory: string;
+  sweetType?: 'barfi' | 'ladoo' | 'bengali-sweet' | 'halwa' | 'peda' | 'roll' | 'chhena-sweet' | 'mawa-sweet' | 'flaky' | 'dry-fruit' | 'festival-combo' | 'gift-box';
+  originRegion?: string;
+  images: ProductImage[];
   variants: ProductVariant[];
   rating: number;
   reviewCount: number;
   tags: string[];
-  description: string;
+  highlights: ProductHighlight[];
   shortDescription: string;
-  nutrition: Record<string, string>;
-  shelfLife: string;
-  storage: string;
+  description: string;
+  ingredients: Ingredient[];
+  allergens: AllergenInfo;
+  nutrition: NutritionalInfo;
+  dietaryTags: DietaryTags;
+  regulatory: RegulatoryInfo;
+  storage: StorageInfo;
+  faqs: FAQ[];
+  delivery: DeliveryInfo;
+  reviews: Review[];
+  seo: SEOData;
   isVeg: boolean;
   isBestseller?: boolean;
   isFresh?: boolean;
   isDeal?: boolean;
   dealEndsAt?: string;
   fssaiNumber?: string;
-  ingredients?: string;
-  faqs?: { question: string; answer: string }[];
+  isSampleData: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Category {
@@ -127,18 +283,6 @@ export interface User {
   email?: string;
   addresses: Address[];
   isLoggedIn: boolean;
-}
-
-export interface Review {
-  id: string;
-  productId: string;
-  userName: string;
-  userLocation: string;
-  rating: number;
-  date: string;
-  comment: string;
-  verifiedPurchase: boolean;
-  helpfulCount: number;
 }
 
 export interface Coupon {
