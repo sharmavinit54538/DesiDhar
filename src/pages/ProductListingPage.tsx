@@ -176,11 +176,11 @@ export const ProductListingPage: React.FC = () => {
               <div
                 className={
                   viewMode === 'grid'
-                    ? 'grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4'
+                    ? 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'
                     : 'space-y-4'
                 }
               >
-                {[1, 2, 3, 4, 5, 6].map((i) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <ProductCardSkeleton key={i} />
                 ))}
               </div>
@@ -188,7 +188,7 @@ export const ProductListingPage: React.FC = () => {
               <div
                 className={
                   viewMode === 'grid'
-                    ? 'grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-4'
+                    ? 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'
                     : 'space-y-4'
                 }
               >
@@ -214,14 +214,63 @@ export const ProductListingPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Sticky Filter + Sort Floating Pill */}
+      <div className="lg:hidden fixed bottom-18 left-1/2 -translate-x-1/2 z-30 flex items-center bg-stone-900/90 backdrop-blur-md text-white rounded-full p-1 shadow-2xl border border-stone-700">
+        <button
+          type="button"
+          onClick={() => setMobileFilterDrawerOpen(true)}
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold hover:text-amber-300 transition-colors"
+        >
+          <span>Filters</span>
+          {filters.brands.length > 0 || filters.dietary.length > 0 ? (
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+          ) : null}
+        </button>
+        <span className="w-px h-4 bg-stone-600" />
+        <button
+          type="button"
+          onClick={() => {
+            const selectEl = document.getElementById('sort-select');
+            if (selectEl) {
+              selectEl.scrollIntoView({ behavior: 'smooth' });
+              selectEl.focus();
+            }
+          }}
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold hover:text-amber-300 transition-colors"
+        >
+          <span>Sort ({filters.sortBy})</span>
+        </button>
+      </div>
+
       {/* Mobile Filters Drawer */}
       <Drawer
         isOpen={isMobileFilterDrawerOpen}
         onClose={() => setMobileFilterDrawerOpen(false)}
         title="Filter Dairy & Sweets"
         position="left"
+        footer={
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                resetFilters();
+                setMobileFilterDrawerOpen(false);
+              }}
+              className="flex-1 py-2.5 rounded-xl border border-stone-300 text-stone-700 font-bold text-xs hover:bg-stone-100 transition-colors"
+            >
+              Clear All
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileFilterDrawerOpen(false)}
+              className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs transition-colors shadow-xs"
+            >
+              Apply Filters ({products.length})
+            </button>
+          </div>
+        }
       >
-        <FilterSidebar onFilterChange={() => setMobileFilterDrawerOpen(false)} />
+        <FilterSidebar />
       </Drawer>
     </>
   );

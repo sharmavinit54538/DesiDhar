@@ -176,28 +176,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
         </div>
 
         {/* Pricing & Add to Cart button */}
-        <div className="mt-3.5 pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+        <div className="mt-2.5 sm:mt-3.5 pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between gap-1 sm:gap-2">
           {/* Price */}
-          <div className="flex flex-col">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-extrabold text-[#4A2C17]">
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-baseline gap-1 flex-wrap">
+              <span className="text-sm sm:text-base font-extrabold text-[#4A2C17] whitespace-nowrap">
                 {formatINR(activeVariant.price)}
               </span>
               {activeVariant.mrp > activeVariant.price && (
-                <span className="text-xs text-stone-400 line-through">
+                <span className="text-[10px] sm:text-xs text-stone-400 line-through whitespace-nowrap">
                   {formatINR(activeVariant.mrp)}
                 </span>
               )}
             </div>
             {discountPercent > 0 && (
-              <span className="text-[10px] text-emerald-800 font-bold">
+              <span className="text-[9px] sm:text-[10px] text-emerald-800 font-bold truncate">
                 Save {formatINR(activeVariant.mrp - activeVariant.price)}
               </span>
             )}
           </div>
 
           {/* Quantity Stepper or Add button */}
-          <div>
+          <div className="shrink-0">
             {quantityInCart > 0 ? (
               <QuantityStepper
                 quantity={quantityInCart}
@@ -212,10 +212,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
                 type="button"
                 onClick={handleAddToCart}
                 disabled={activeVariant.stock <= 0}
-                className="h-8 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-stone-950 font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all disabled:opacity-50 disabled:bg-stone-200"
+                className="h-8 px-2.5 sm:px-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-stone-950 font-bold text-[11px] sm:text-xs flex items-center gap-1 shadow-xs transition-all disabled:opacity-50 disabled:bg-stone-200"
               >
-                <ShoppingBag className="w-3.5 h-3.5" />
-                <span>{activeVariant.stock > 0 ? 'ADD' : 'Out of Stock'}</span>
+                <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                <span>{activeVariant.stock > 0 ? 'ADD' : 'Out'}</span>
               </button>
             )}
           </div>

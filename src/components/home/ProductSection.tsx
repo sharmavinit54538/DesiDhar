@@ -66,8 +66,8 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
         )}
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
+      {/* Grid: 2 cols on mobile, 3 tablet, 4 laptop, 5 large desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

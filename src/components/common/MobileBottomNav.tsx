@@ -32,7 +32,7 @@ export const MobileBottomNav: React.FC = () => {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200/90 shadow-lg px-2 py-1 safe-bottom"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(74,44,23,0.06)] px-1 py-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
     >
       <div className="flex items-center justify-around">
         {navItems.map((item, index) => {
@@ -44,7 +44,7 @@ export const MobileBottomNav: React.FC = () => {
                 key={index}
                 type="button"
                 onClick={item.onClick}
-                className="flex flex-col items-center justify-center py-1 px-3 text-stone-500 hover:text-amber-600 transition-colors"
+                className="flex flex-col items-center justify-center min-h-[46px] min-w-[48px] py-1 px-3 text-stone-500 hover:text-amber-600 transition-colors cursor-pointer"
               >
                 <div className="relative">
                   <Icon className="w-5 h-5" />
@@ -60,9 +60,9 @@ export const MobileBottomNav: React.FC = () => {
               to={item.to!}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center justify-center py-1 px-3 transition-colors select-none',
+                  'flex flex-col items-center justify-center min-h-[46px] min-w-[48px] py-1 px-3 transition-colors select-none rounded-xl',
                   isActive
-                    ? 'text-amber-600 font-bold'
+                    ? 'text-amber-600 font-bold bg-amber-50/70'
                     : 'text-stone-500 hover:text-amber-600 font-medium'
                 )
               }

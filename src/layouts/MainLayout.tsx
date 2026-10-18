@@ -19,7 +19,7 @@ export const MainLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#FFFDF9] text-[#4A2C17]">
       <Navbar />
 
-      <main className="flex-1">
+      <main className="flex-1 pb-20 md:pb-0 min-w-0">
         <Outlet />
       </main>
 
