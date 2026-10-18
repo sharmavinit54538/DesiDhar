@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
-import { Product, Category } from '../types';
+import type { Product, Category } from '../types';
 import { useFilterStore } from '../store/filterStore';
 import { useUiStore } from '../store/uiStore';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';

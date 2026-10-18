@@ -1,4 +1,4 @@
-import { HeroBanner } from '../types';
+import type { HeroBanner } from '../types';
 
 export const HERO_BANNERS: HeroBanner[] = [
   {

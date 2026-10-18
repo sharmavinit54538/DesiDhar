@@ -57,7 +57,9 @@ export const CustomerReviews: React.FC = () => {
                 <h4 className="text-xs font-bold text-[#4A2C17] flex items-center gap-1">
                   <span>{review.userName}</span>
                   {review.verifiedPurchase && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" title="Verified Customer" />
+                    <span title="Verified Customer" className="inline-flex">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    </span>
                   )}
                 </h4>
                 <p className="text-[11px] text-stone-400">{review.userLocation}</p>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
-import { Product } from '../types';
+import type { Product } from '../types';
 import { CategoryStrip } from '../components/home/CategoryStrip';
 import { HeroCarousel } from '../components/home/HeroCarousel';
 import { DealOfTheDay } from '../components/home/DealOfTheDay';

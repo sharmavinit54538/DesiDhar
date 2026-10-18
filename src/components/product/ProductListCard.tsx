@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../../types';
+import type { Product } from '../../types';
 import { formatINR, calculateDiscountPercent } from '../../utils/formatters';
 import { RatingBadge } from '../common/RatingBadge';
 import { VegBadge } from '../common/VegBadge';

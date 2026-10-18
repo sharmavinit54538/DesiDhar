@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
-import { Order } from '../types';
+import type { Order } from '../types';
 import { formatINR, formatDate, formatDateTime } from '../utils/formatters';
 import { useCartStore } from '../store/cartStore';
 import { useUiStore } from '../store/uiStore';

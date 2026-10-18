@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Clock, ArrowRight, Sparkles } from 'lucide-react';
 import { api } from '../../services/api';
-import { Product, Category } from '../../types';
+import type { Product, Category } from '../../types';
 import { formatINR } from '../../utils/formatters';
 import { RatingBadge } from './RatingBadge';
 import { cn } from '../../utils/cn';

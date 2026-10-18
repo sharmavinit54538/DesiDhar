@@ -8,7 +8,7 @@ export const HeroCarousel: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const total = HERO_BANNERS.length;
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nextSlide = () => {
     setCurrent((prev) => (prev + 1) % total);

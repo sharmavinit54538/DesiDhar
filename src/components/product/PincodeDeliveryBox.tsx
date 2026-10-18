@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore } from '../../store/uiStore';
 import { api } from '../../services/api';
-import { PincodeCheckResult } from '../../types';
+import type { PincodeCheckResult } from '../../types';
 import { MapPin, Truck, Snowflake, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const PincodeDeliveryBox: React.FC = () => {

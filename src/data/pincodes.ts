@@ -1,4 +1,4 @@
-import { PincodeCheckResult } from '../types';
+import type { PincodeCheckResult } from '../types';
 
 export const SERVICEABLE_PINCODES: Record<string, PincodeCheckResult> = {
   // Delhi NCR

@@ -4,7 +4,7 @@ import { useUiStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { api } from '../../services/api';
 import { MapPin, CheckCircle2, AlertCircle, Snowflake, Search } from 'lucide-react';
-import { PincodeCheckResult } from '../../types';
+import type { PincodeCheckResult } from '../../types';
 
 const POPULAR_LOCATIONS = [
   { city: 'New Delhi (CP)', pincode: '110001' },

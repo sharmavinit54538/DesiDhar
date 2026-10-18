@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFilterStore } from '../../store/filterStore';
-import { SortOption } from '../../types';
+import type { SortOption } from '../../types';
 import { LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 

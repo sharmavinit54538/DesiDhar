@@ -5,7 +5,7 @@ import { Input } from '../common/Input';
 import { Star } from 'lucide-react';
 import { api } from '../../services/api';
 import { useUiStore } from '../../store/uiStore';
-import { Review } from '../../types';
+import type { Review } from '../../types';
 
 interface WriteReviewModalProps {
   isOpen: boolean;
@@ -47,6 +47,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
         rating,
         comment: comment.trim(),
         verifiedPurchase: true,
+        helpfulCount: 0,
       });
       onReviewAdded(newReview);
       addToast('Thank you! Your review has been published.', 'success');

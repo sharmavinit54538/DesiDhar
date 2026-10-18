@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import confetti from 'canvas-confetti';
 import { api } from '../services/api';
-import { Order } from '../types';
+import type { Order } from '../types';
 import { formatINR } from '../utils/formatters';
 import { Button } from '../components/common/Button';
 import { OrderTimeline } from '../components/order/OrderTimeline';

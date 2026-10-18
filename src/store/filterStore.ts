@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { FilterState, SortOption } from '../types';
+import type { FilterState, SortOption } from '../types';
 
 interface FilterStoreState {
   filters: FilterState;

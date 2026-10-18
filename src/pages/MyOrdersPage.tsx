@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
-import { Order } from '../types';
+import type { Order } from '../types';
 import { useCartStore } from '../store/cartStore';
 import { useUiStore } from '../store/uiStore';
 import { OrderCard } from '../components/order/OrderCard';

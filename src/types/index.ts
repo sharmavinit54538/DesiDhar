@@ -1,3 +1,5 @@
+export const DESIDHAR_VERSION = '1.0.0';
+
 export interface ProductVariant {
   id: string;
   weight: string;

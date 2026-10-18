@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../../types';
+import type { Product } from '../../types';
 import { ProductCard } from '../product/ProductCard';
 import { Flame, Clock, ArrowRight } from 'lucide-react';
 

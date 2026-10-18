@@ -6,7 +6,7 @@ import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { AddressFormModal } from '../components/checkout/AddressFormModal';
-import { Address } from '../types';
+import type { Address } from '../types';
 import {
   User,
   Phone,
