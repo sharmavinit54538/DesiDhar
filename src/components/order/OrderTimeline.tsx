@@ -1,5 +1,5 @@
 import React from 'react';
-import { OrderTimelineItem } from '../../types';
+import type { OrderTimelineItem } from '../../types';
 import { Check, Clock, Package, Truck, Home, XCircle } from 'lucide-react';
 import { cn } from '../../utils/cn';
 

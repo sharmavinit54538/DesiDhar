@@ -1,5 +1,5 @@
 import React from 'react';
-import { OrderPricing } from '../../types';
+import type { OrderPricing } from '../../types';
 import { formatINR } from '../../utils/formatters';
 import { Button } from '../common/Button';
 import { ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';

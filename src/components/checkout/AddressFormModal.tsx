@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { Address } from '../../types';
+import type { Address } from '../../types';
 
 const addressSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),

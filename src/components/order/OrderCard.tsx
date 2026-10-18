@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Order } from '../../types';
+import type { Order } from '../../types';
 import { formatINR, formatDate } from '../../utils/formatters';
 import { Button } from '../common/Button';
 import { ChevronRight, Clock, PackageCheck, Truck, RefreshCw } from 'lucide-react';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Address, DeliverySlot, PaymentMethod, CartItem, OrderPricing } from '../../types';
+import type { Address, DeliverySlot, PaymentMethod, CartItem, OrderPricing } from '../../types';
 import { formatINR } from '../../utils/formatters';
 import { Button } from '../common/Button';
 import { VegBadge } from '../common/VegBadge';

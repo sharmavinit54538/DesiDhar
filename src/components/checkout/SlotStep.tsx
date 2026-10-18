@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeliverySlot } from '../../types';
+import type { DeliverySlot } from '../../types';
 import { Button } from '../common/Button';
 import { Clock, Sunrise, Sun, Sunset, Snowflake } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Address } from '../../types';
+import type { Address } from '../../types';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../common/Button';
 import { Plus, CheckCircle2, Edit2, Trash2, MapPin } from 'lucide-react';

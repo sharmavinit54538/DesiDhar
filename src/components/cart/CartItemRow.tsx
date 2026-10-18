@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CartItem } from '../../types';
+import type { CartItem } from '../../types';
 import { formatINR, calculateDiscountPercent } from '../../utils/formatters';
 import { QuantityStepper } from '../common/QuantityStepper';
 import { VegBadge } from '../common/VegBadge';
