@@ -57,8 +57,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Cow Ghee',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g2-500', weight: '500ml', price: 449, mrp: 549, stock: 50, sku: 'DD-GHEE-COW-500' },
@@ -85,7 +84,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Buffalo Ghee',
     images: [
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g3-500', weight: '500ml', price: 469, mrp: 550, stock: 25, sku: 'DD-GHEE-BUF-500' },
@@ -111,7 +110,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'A2 Cow Ghee',
     images: [
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g4-500', weight: '500ml', price: 950, mrp: 1200, stock: 20, sku: 'DD-GHEE-HIM-500' },
@@ -137,7 +136,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Infused Ghee',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g5-250', weight: '250ml', price: 549, mrp: 699, stock: 18, sku: 'DD-GHEE-BRM-250' },
@@ -163,7 +162,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Flavored Ghee',
     images: [
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g6-250', weight: '250g', price: 349, mrp: 420, stock: 22, sku: 'DD-GHEE-GAR-250' }
@@ -188,7 +187,7 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Flavored Ghee',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-ghee.svg'
     ],
     variants: [
       { id: 'v-g7-250', weight: '250ml', price: 625, mrp: 750, stock: 19, sku: 'DD-GHEE-KSR-250' },
@@ -216,8 +215,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'A2 Milk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
     ],
     variants: [
       { id: 'v-m1-1000', weight: '1 Litre Bottle', price: 92, mrp: 110, stock: 120, sku: 'DD-MILK-A2-1L' },
@@ -257,7 +255,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Cow Milk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m2-1000', weight: '1 Litre Pouch', price: 68, mrp: 75, stock: 200, sku: 'DD-MILK-COW-1L' },
@@ -285,7 +283,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Buffalo Milk',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m3-1000', weight: '1 Litre Pouch', price: 78, mrp: 86, stock: 150, sku: 'DD-MILK-BUF-1L' },
@@ -312,7 +310,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Toned Milk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m4-1000', weight: '1 Litre', price: 58, mrp: 65, stock: 80, sku: 'DD-MILK-TONED-1L' }
@@ -364,7 +362,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Flavored Milk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m6-500', weight: '500ml Bottle', price: 110, mrp: 135, stock: 50, sku: 'DD-MILK-HLD-500' }
@@ -389,7 +387,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Cow Milk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m7-1000', weight: '1 Litre Pouch', price: 69, mrp: 76, stock: 95, sku: 'DD-MILK-GLD-1L' }
@@ -414,7 +412,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Specialty Milk',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-milk.svg'
     ],
     variants: [
       { id: 'v-m8-500', weight: '500ml Bottle', price: 299, mrp: 399, stock: 15, sku: 'DD-MILK-COL-500' }
@@ -441,8 +439,7 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Cultured Butter',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
     ],
     variants: [
       { id: 'v-b1-250', weight: '250g Container', price: 169, mrp: 210, stock: 45, sku: 'DD-BTR-WHT-250' },
@@ -474,7 +471,7 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Table Butter',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-butter.svg'
     ],
     variants: [
       { id: 'v-b2-100', weight: '100g Bar', price: 62, mrp: 68, stock: 90, sku: 'DD-BTR-SLT-100' },
@@ -500,7 +497,7 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Gourmet Butter',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-butter.svg'
     ],
     variants: [
       { id: 'v-b3-200', weight: '200g Tub', price: 189, mrp: 230, stock: 35, sku: 'DD-BTR-GAR-200' }
@@ -525,7 +522,7 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Baking Butter',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-butter.svg'
     ],
     variants: [
       { id: 'v-b4-250', weight: '250g Block', price: 175, mrp: 210, stock: 30, sku: 'DD-BTR-UNS-250' },
@@ -551,7 +548,7 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Gourmet Butter',
     images: [
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-butter.svg'
     ],
     variants: [
       { id: 'v-b5-200', weight: '200g Tub', price: 195, mrp: 240, stock: 28, sku: 'DD-BTR-SMK-200' }
@@ -621,7 +618,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'A2 Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-paneer.svg'
     ],
     variants: [
       { id: 'v-p2-200', weight: '200g Block', price: 155, mrp: 185, stock: 50, sku: 'DD-PNR-A2-200' },
@@ -648,7 +645,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Diet Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-paneer.svg'
     ],
     variants: [
       { id: 'v-p3-200', weight: '200g Pack', price: 115, mrp: 135, stock: 60, sku: 'DD-PNR-DIET-200' },
@@ -675,7 +672,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Flavored Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-paneer.svg'
     ],
     variants: [
       { id: 'v-p4-250', weight: '250g Block', price: 145, mrp: 175, stock: 35, sku: 'DD-PNR-JRA-250' }
@@ -701,7 +698,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Gourmet Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-paneer.svg'
     ],
     variants: [
       { id: 'v-p5-250', weight: '250g Pre-cut Cubes', price: 155, mrp: 190, stock: 30, sku: 'DD-PNR-SMK-250' }
@@ -727,7 +724,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Malai Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-paneer.svg'
     ],
     variants: [
       { id: 'v-p6-400', weight: '400g Block', price: 230, mrp: 275, stock: 50, sku: 'DD-PNR-BUF-400' }
@@ -783,7 +780,7 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Cooking Cream',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cream.svg'
     ],
     variants: [
       { id: 'v-c2-250', weight: '250ml Pack', price: 95, mrp: 115, stock: 65, sku: 'DD-CRM-CK-250' },
@@ -811,7 +808,7 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Whipping Cream',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cream.svg'
     ],
     variants: [
       { id: 'v-c3-500', weight: '500ml Carton', price: 220, mrp: 265, stock: 35, sku: 'DD-CRM-WHP-500' }
@@ -836,7 +833,7 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Flavored Malai',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cream.svg'
     ],
     variants: [
       { id: 'v-c4-200', weight: '200g Tub', price: 175, mrp: 215, stock: 25, sku: 'DD-CRM-KSR-200' }
@@ -863,7 +860,7 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Matka Dahi',
     images: [
-      'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-curd-dahi.svg'
     ],
     variants: [
       { id: 'v-d1-400', weight: '400g Earthen Matka', price: 65, mrp: 75, stock: 85, sku: 'DD-DAHI-MTK-400' },
@@ -891,7 +888,7 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Set Dahi',
     images: [
-      'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-curd-dahi.svg'
     ],
     variants: [
       { id: 'v-d2-400', weight: '400g Tub', price: 48, mrp: 55, stock: 110, sku: 'DD-DAHI-COW-400' },
@@ -918,7 +915,7 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Mishti Doi',
     images: [
-      'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-curd-dahi.svg'
     ],
     variants: [
       { id: 'v-d3-200', weight: '200g Clay Handi', price: 55, mrp: 65, stock: 70, sku: 'DD-DAHI-MSH-200' },
@@ -945,7 +942,7 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Flavored Dahi',
     images: [
-      'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-curd-dahi.svg'
     ],
     variants: [
       { id: 'v-d4-200', weight: '200g Cup', price: 65, mrp: 79, stock: 55, sku: 'DD-DAHI-MNG-200' },
@@ -971,7 +968,7 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Chaas & Buttermilk',
     images: [
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-curd-dahi.svg'
     ],
     variants: [
       { id: 'v-d5-300', weight: '300ml Bottle', price: 28, mrp: 35, stock: 120, sku: 'DD-DAHI-CHS-300' },
@@ -1000,7 +997,7 @@ export const PRODUCTS: Product[] = [
     category: 'cheese',
     subcategory: 'Fresh Mozzarella',
     images: [
-      'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cheese.svg'
     ],
     variants: [
       { id: 'v-ch1-200', weight: '200g Tub (In Whey)', price: 185, mrp: 225, stock: 35, sku: 'DD-CHS-MOZ-200' },
@@ -1053,7 +1050,7 @@ export const PRODUCTS: Product[] = [
     category: 'cheese',
     subcategory: 'Processed Cheese',
     images: [
-      'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cheese.svg'
     ],
     variants: [
       { id: 'v-ch3-200', weight: '200g (10 Slices)', price: 135, mrp: 155, stock: 80, sku: 'DD-CHS-SLC-200' },
@@ -1079,7 +1076,7 @@ export const PRODUCTS: Product[] = [
     category: 'cheese',
     subcategory: 'Fresh Chhena',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-cheese.svg'
     ],
     variants: [
       { id: 'v-ch4-250', weight: '250g Container', price: 125, mrp: 150, stock: 40, sku: 'DD-CHS-CHN-250' },
@@ -1112,10 +1109,7 @@ export const PRODUCTS: Product[] = [
     originRegion: 'Rajasthan & North India',
     images: [
       '/images/products/mithai/shuddh-desi-ghee-kaju-katli/main-800.webp',
-      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/closeup-800.webp',
-      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/packaging-800.webp',
-      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/serving-800.webp',
-      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/size-reference-800.webp',
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/serving-800.webp'
     ],
     variants: [
       { id: 'v-s1-250', weight: '250g Box (10-12 pcs)', price: 295, mrp: 350, stock: 65, sku: 'DD-SWT-KAJU-250' },
@@ -1165,7 +1159,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Mawa Sweets',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s2-500', weight: '500g Container (12 pcs)', price: 245, mrp: 295, stock: 50, sku: 'DD-SWT-GJ-500' },
@@ -1193,7 +1187,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Chhena Sweets',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s3-500', weight: '500g (5 Large Pcs)', price: 295, mrp: 350, stock: 45, sku: 'DD-SWT-RM-500' },
@@ -1221,7 +1215,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Chhena Sweets',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s4-500', weight: '500g Can (8 Pcs)', price: 185, mrp: 220, stock: 60, sku: 'DD-SWT-RSG-500' },
@@ -1247,7 +1241,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Ladoo',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s5-250', weight: '250g Box', price: 195, mrp: 235, stock: 60, sku: 'DD-SWT-MOTI-250' },
@@ -1275,7 +1269,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Peda & Barfi',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s6-250', weight: '250g Box', price: 210, mrp: 250, stock: 45, sku: 'DD-SWT-PEDA-250' },
@@ -1301,7 +1295,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Peda & Barfi',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s7-250', weight: '250g Box', price: 235, mrp: 280, stock: 40, sku: 'DD-SWT-BRF-250' },
@@ -1327,7 +1321,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Flaky Mithai',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s8-250', weight: '250g Box', price: 165, mrp: 195, stock: 70, sku: 'DD-SWT-SOAN-250' },
@@ -1353,7 +1347,7 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Ladoo',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-mithai.svg'
     ],
     variants: [
       { id: 'v-s9-250', weight: '250g Box', price: 195, mrp: 235, stock: 50, sku: 'DD-SWT-BSN-250' },
@@ -1434,7 +1428,7 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Mithai Bundles',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/serving-800.webp'
     ],
     variants: [
       { id: 'v-cb3-std', weight: '1 kg Total (500g + 500g)', price: 749, mrp: 975, stock: 45, sku: 'DD-CMB-SWT-STD' }
@@ -1460,7 +1454,7 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Wellness Bundles',
     images: [
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-combo-packs.svg'
     ],
     variants: [
       { id: 'v-cb4-std', weight: 'Wellness Pack', price: 1899, mrp: 2390, stock: 25, sku: 'DD-CMB-AYU-STD' }
@@ -1485,7 +1479,7 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Fitness Bundles',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-combo-packs.svg'
     ],
     variants: [
       { id: 'v-cb5-std', weight: 'Weekly Fitness Pack', price: 449, mrp: 545, stock: 35, sku: 'DD-CMB-FIT-STD' }
@@ -1512,8 +1506,7 @@ export const PRODUCTS: Product[] = [
     category: 'gift-boxes',
     subcategory: 'Royal Hampers',
     images: [
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/packaging-800.webp'
     ],
     variants: [
       { id: 'v-gb1-1200', weight: '1.2 kg Heritage Box', price: 1499, mrp: 1899, stock: 30, sku: 'DD-GFT-ROY-1200' }
@@ -1539,7 +1532,7 @@ export const PRODUCTS: Product[] = [
     category: 'gift-boxes',
     subcategory: 'Ayurvedic Gifts',
     images: [
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-gift-boxes.svg'
     ],
     variants: [
       { id: 'v-gb2-std', weight: 'Gift Box (500ml Ghee + 350g Honey)', price: 1650, mrp: 2100, stock: 25, sku: 'DD-GFT-VED-STD' }
@@ -1564,7 +1557,7 @@ export const PRODUCTS: Product[] = [
     category: 'gift-boxes',
     subcategory: 'Festive Hampers',
     images: [
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-gift-boxes.svg'
     ],
     variants: [
       { id: 'v-gb3-std', weight: '1.5 kg Grand Box', price: 1850, mrp: 2400, stock: 20, sku: 'DD-GFT-UTS-STD' }
@@ -1589,7 +1582,7 @@ export const PRODUCTS: Product[] = [
     category: 'gift-boxes',
     subcategory: 'Gift Boxes',
     images: [
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80'
+      '/images/placeholders/category-gift-boxes.svg'
     ],
     variants: [
       { id: 'v-gb4-750', weight: '750g Gift Box', price: 849, mrp: 1050, stock: 40, sku: 'DD-GFT-BND-750' }
