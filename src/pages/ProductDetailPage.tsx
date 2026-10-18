@@ -19,6 +19,11 @@ import { RatingBreakdown } from '../components/product/RatingBreakdown';
 import { WriteReviewModal } from '../components/product/WriteReviewModal';
 import { ProductCard } from '../components/product/ProductCard';
 import { Skeleton } from '../components/common/Skeleton';
+import { NutritionFactsTable } from '../components/product/NutritionFactsTable';
+import { AllergenBadgeRow } from '../components/product/AllergenBadgeRow';
+import { ProductSpecificationsTable } from '../components/product/ProductSpecificationsTable';
+import { StickyActionBar } from '../components/common/StickyActionBar';
+import { getProductImagesBySlug } from '../data/productImages';
 import {
   Heart,
   ShoppingBag,
@@ -121,6 +126,9 @@ export const ProductDetailPage: React.FC = () => {
   const cartItem = items.find((i) => i.variantId === activeVariant.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
 
+  const productImages = getProductImagesBySlug(product.slug);
+  const displayImages = productImages.length > 0 ? productImages : product.images;
+
   const handleAddToCart = () => {
     addItem(
       {
@@ -129,7 +137,7 @@ export const ProductDetailPage: React.FC = () => {
         name: product.name,
         slug: product.slug,
         brand: product.brand,
-        image: product.images[0],
+        image: typeof displayImages[0] === 'string' ? displayImages[0] : displayImages[0].src,
         weight: activeVariant.weight,
         price: activeVariant.price,
         mrp: activeVariant.mrp,
@@ -159,7 +167,7 @@ export const ProductDetailPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{product.name} | DesiDhar Dairy</title>
+        <title>{product.name} {product.hindiName ? `(${product.hindiName})` : ''} | DesiDhar Dairy</title>
         <meta name="description" content={product.shortDescription} />
       </Helmet>
 
@@ -171,7 +179,7 @@ export const ProductDetailPage: React.FC = () => {
           {/* Left Column: Image Gallery + Quick Action Buttons */}
           <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
             <ImageGallery
-              images={product.images}
+              images={displayImages}
               productName={product.name}
               isDeal={product.isDeal}
               isFresh={product.isFresh}
@@ -212,6 +220,14 @@ export const ProductDetailPage: React.FC = () => {
                   <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
                     {product.brand}
                   </span>
+                  {product.sweetType && (
+                    <>
+                      <span className="text-stone-300">•</span>
+                      <span className="text-xs font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md">
+                        {product.sweetType}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <button
@@ -230,10 +246,30 @@ export const ProductDetailPage: React.FC = () => {
 
               <h1 className="text-xl sm:text-3xl font-extrabold text-[#4A2C17] font-heading tracking-tight leading-tight">
                 {product.name}
+                {product.hindiName && (
+                  <span className="ml-2 font-medium text-stone-500 text-lg sm:text-2xl font-serif">
+                    ({product.hindiName})
+                  </span>
+                )}
               </h1>
 
+              {/* Highlights pills */}
+              {product.highlights && product.highlights.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {product.highlights.map((hl) => (
+                    <span
+                      key={hl}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md"
+                    >
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      {hl}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {/* Rating link */}
-              <div className="flex items-center gap-3 mt-2">
+              <div className="flex items-center gap-3 mt-3">
                 <RatingBadge
                   rating={product.rating}
                   reviewCount={product.reviewCount}
@@ -378,7 +414,7 @@ export const ProductDetailPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
               <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-stone-200">
                 <img
-                  src={product.images[0]}
+                  src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.src}
                   alt={product.name}
                   className="w-14 h-14 object-cover rounded-xl shrink-0"
                 />
@@ -398,7 +434,7 @@ export const ProductDetailPage: React.FC = () => {
                     className="flex-1 flex items-center gap-3 p-3 bg-white rounded-2xl border border-stone-200 hover:border-amber-400 transition-colors"
                   >
                     <img
-                      src={item.images[0]}
+                      src={typeof item.images[0] === 'string' ? item.images[0] : item.images[0]?.src}
                       alt={item.name}
                       className="w-14 h-14 object-cover rounded-xl shrink-0"
                     />
@@ -445,12 +481,15 @@ export const ProductDetailPage: React.FC = () => {
           <div className="py-6 sm:py-8">
             {/* Description Tab */}
             {activeTab === 'desc' && (
-              <div className="space-y-4 max-w-4xl text-xs sm:text-sm text-stone-700 leading-relaxed">
-                <h3 className="text-lg font-bold text-[#4A2C17] font-heading">
-                  The DesiDhar Authenticity Standard
-                </h3>
-                <p>{product.description}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+              <div className="space-y-6 max-w-4xl text-xs sm:text-sm text-stone-700 leading-relaxed">
+                <div>
+                  <h3 className="text-lg font-bold text-[#4A2C17] font-heading mb-2">
+                    The DesiDhar Authenticity Standard
+                  </h3>
+                  <p className="text-stone-700 leading-relaxed">{product.description}</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200">
                     <h4 className="font-bold text-[#4A2C17] mb-1">Untouched by Hands</h4>
                     <p className="text-xs text-stone-600">
@@ -464,6 +503,9 @@ export const ProductDetailPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Flipkart/Amazon-style full specifications */}
+                <ProductSpecificationsTable product={product} activeVariant={activeVariant} />
               </div>
             )}
 
@@ -479,31 +521,15 @@ export const ProductDetailPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div>
-                  <h4 className="font-bold text-xs uppercase tracking-wider text-stone-500 mb-2">
-                    Nutritional Information (Approximate values per 100g / 100ml)
-                  </h4>
-                  <div className="border border-stone-200 rounded-2xl overflow-hidden">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-stone-50 border-b border-stone-200 font-bold text-stone-700">
-                        <tr>
-                          <th className="p-3">Nutrient Parameter</th>
-                          <th className="p-3 text-right">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-stone-100">
-                        {Object.entries(product.nutrition).map(([key, val]) => (
-                          <tr key={key} className="hover:bg-amber-50/30">
-                            <td className="p-3 font-medium text-stone-700">{key}</td>
-                            <td className="p-3 text-right font-mono font-bold text-stone-900">
-                              {val}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                {/* Allergen Badge Row */}
+                <AllergenBadgeRow allergens={product.allergens} ingredientsText={product.ingredients} />
+
+                {/* Nutrition Facts Table */}
+                <NutritionFactsTable
+                  nutrition={product.nutrition}
+                  servingSize={product.category === 'milk' ? '100ml' : '100g'}
+                  isSampleData={false}
+                />
               </div>
             )}
 
@@ -600,6 +626,45 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Sticky Action Bar */}
+      <StickyActionBar
+        leftContent={
+          <div>
+            <div className="text-[11px] text-stone-500 font-medium truncate">{activeVariant.weight}</div>
+            <div className="text-base font-extrabold text-[#4A2C17] font-heading leading-tight">
+              {formatINR(activeVariant.price)}
+              {activeVariant.mrp > activeVariant.price && (
+                <span className="text-xs text-stone-400 line-through ml-1.5 font-normal">
+                  {formatINR(activeVariant.mrp)}
+                </span>
+              )}
+            </div>
+          </div>
+        }
+        rightAction={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<ShoppingBag className="w-3.5 h-3.5" />}
+              onClick={handleAddToCart}
+              disabled={activeVariant.stock <= 0}
+            >
+              Add
+            </Button>
+            <Button
+              variant="gold"
+              size="sm"
+              leftIcon={<Zap className="w-3.5 h-3.5 fill-current" />}
+              onClick={handleBuyNow}
+              disabled={activeVariant.stock <= 0}
+            >
+              Buy Now
+            </Button>
+          </div>
+        }
+      />
 
       {/* Write Review Modal */}
       {isReviewModalOpen && (

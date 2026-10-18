@@ -31,13 +31,15 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    const firstImage = product.images[0];
+    const imageSrc = typeof firstImage === 'string' ? firstImage : firstImage?.src || '';
     addItem({
       productId: product.id,
       variantId: activeVariant.id,
       name: product.name,
       slug: product.slug,
       brand: product.brand,
-      image: product.images[0],
+      image: imageSrc,
       weight: activeVariant.weight,
       price: activeVariant.price,
       mrp: activeVariant.mrp,
@@ -53,7 +55,7 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
       <div className="relative w-full sm:w-44 h-44 sm:h-36 rounded-xl overflow-hidden bg-stone-50 shrink-0">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           <img
-            src={product.images[0]}
+            src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.src}
             alt={product.name}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />

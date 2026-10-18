@@ -15,6 +15,7 @@ import { HERO_BANNERS } from '../data/banners';
 import { MOCK_COUPONS } from '../data/coupons';
 import { SERVICEABLE_PINCODES } from '../data/pincodes';
 import { MOCK_REVIEWS } from '../data/reviews';
+import { getProductImagesBySlug } from '../data/productImages';
 
 // Artificial delay helper to simulate real HTTP latency
 const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -57,6 +58,18 @@ function saveStoredReviews(reviews: Review[]): void {
   }
 }
 
+function enrichProductImages(product: Product): Product {
+  const richImages = getProductImagesBySlug(product.slug);
+  if (richImages.length > 0) {
+    return { ...product, images: richImages };
+  }
+  return product;
+}
+
+function enrichProductsWithImages(products: Product[]): Product[] {
+  return products.map(enrichProductImages);
+}
+
 /**
  * Mock API Service
  * Can be swapped directly with Axios or Fetch calls against a real REST or GraphQL backend
@@ -65,7 +78,7 @@ export const api = {
   // Products
   async getProducts(filters?: Partial<FilterState>): Promise<{ products: Product[]; total: number }> {
     await delay(180);
-    let result = [...PRODUCTS];
+    let result = enrichProductsWithImages([...PRODUCTS]);
 
     if (filters?.category && filters.category !== 'all') {
       result = result.filter(p => p.category.toLowerCase() === filters.category?.toLowerCase());
@@ -156,50 +169,62 @@ export const api = {
   async getProductBySlug(slug: string): Promise<Product | null> {
     await delay(120);
     const product = PRODUCTS.find(p => p.slug === slug);
-    return product || null;
+    return product ? enrichProductImages(product) : null;
   },
 
   async getProductById(id: string): Promise<Product | null> {
     await delay(100);
     const product = PRODUCTS.find(p => p.id === id);
-    return product || null;
+    return product ? enrichProductImages(product) : null;
   },
 
   async getRelatedProducts(productId: string, category: string, limit = 4): Promise<Product[]> {
     await delay(150);
-    return PRODUCTS
-      .filter(p => p.category === category && p.id !== productId)
-      .slice(0, limit);
+    return enrichProductsWithImages(
+      PRODUCTS
+        .filter(p => p.category === category && p.id !== productId)
+        .slice(0, limit)
+    );
   },
 
   async getFrequentlyBoughtTogether(product: Product): Promise<Product[]> {
     await delay(100);
     // Suggest items from complementary dairy categories (e.g. if ghee, suggest paneer and dahi)
     const complementCategories = ['curd-dahi', 'paneer', 'butter', 'milk', 'mithai'];
-    return PRODUCTS
-      .filter(p => p.id !== product.id && complementCategories.includes(p.category))
-      .slice(0, 2);
+    return enrichProductsWithImages(
+      PRODUCTS
+        .filter(p => p.id !== product.id && complementCategories.includes(p.category))
+        .slice(0, 2)
+    );
   },
 
   // Home curated sections
   async getDealOfTheDay(): Promise<Product[]> {
     await delay(100);
-    return PRODUCTS.filter(p => p.isDeal || p.tags.includes('Deal of Day')).slice(0, 6);
+    return enrichProductsWithImages(
+      PRODUCTS.filter(p => p.isDeal || p.tags.includes('Deal of Day')).slice(0, 6)
+    );
   },
 
   async getBestSellers(): Promise<Product[]> {
     await delay(100);
-    return PRODUCTS.filter(p => p.isBestseller).slice(0, 8);
+    return enrichProductsWithImages(
+      PRODUCTS.filter(p => p.isBestseller).slice(0, 8)
+    );
   },
 
   async getFreshToday(): Promise<Product[]> {
     await delay(100);
-    return PRODUCTS.filter(p => p.isFresh || p.tags.includes('Fresh Today')).slice(0, 8);
+    return enrichProductsWithImages(
+      PRODUCTS.filter(p => p.isFresh || p.tags.includes('Fresh Today')).slice(0, 8)
+    );
   },
 
   async getFestiveSweets(): Promise<Product[]> {
     await delay(100);
-    return PRODUCTS.filter(p => p.category === 'mithai' || p.category === 'gift-boxes').slice(0, 8);
+    return enrichProductsWithImages(
+      PRODUCTS.filter(p => p.category === 'mithai' || p.category === 'gift-boxes').slice(0, 8)
+    );
   },
 
   // Categories

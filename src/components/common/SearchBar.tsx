@@ -267,7 +267,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                       className="px-4 py-2.5 hover:bg-amber-50/60 cursor-pointer flex items-center gap-3 transition-colors"
                     >
                       <img
-                        src={prod.images[0]}
+                        src={typeof prod.images[0] === 'string' ? prod.images[0] : prod.images[0]?.src}
                         alt={prod.name}
                         className="w-12 h-12 object-cover rounded-lg border border-stone-200 shrink-0"
                       />

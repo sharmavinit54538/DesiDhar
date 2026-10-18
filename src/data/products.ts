@@ -10,9 +10,8 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'A2 Cow Ghee',
     images: [
-      'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      '/images/products/ghee/desi-a2-gir-cow-bilona-ghee/main-800.webp',
+      '/images/products/ghee/desi-a2-gir-cow-bilona-ghee/serving-800.webp'
     ],
     variants: [
       { id: 'v-g1-250', weight: '250ml', price: 499, mrp: 599, stock: 35, sku: 'DD-GHEE-A2-250' },
@@ -338,7 +337,7 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Flavored Milk',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+      '/images/products/milk/shuddh-masala-badam-kesar-milk/main-800.webp'
     ],
     variants: [
       { id: 'v-m5-200', weight: '200ml Glass Bottle', price: 55, mrp: 65, stock: 110, sku: 'DD-MILK-KSR-200' },
@@ -579,8 +578,9 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Malai Paneer',
     images: [
-      'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80'
+      '/images/products/paneer/farm-fresh-malai-paneer/main-800.webp',
+      '/images/products/paneer/farm-fresh-malai-paneer/closeup-800.webp',
+      '/images/products/paneer/farm-fresh-malai-paneer/serving-800.webp'
     ],
     variants: [
       { id: 'v-p1-200', weight: '200g Block', price: 110, mrp: 130, stock: 95, sku: 'DD-PNR-MAL-200' },
@@ -755,7 +755,7 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Desi Malai',
     images: [
-      'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80'
+      '/images/products/cream/pure-clotted-desi-malai/main-800.webp'
     ],
     variants: [
       { id: 'v-c1-250', weight: '250g Jar', price: 145, mrp: 180, stock: 40, sku: 'DD-CRM-MAL-250' },
@@ -1382,7 +1382,7 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Daily Bundles',
     images: [
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'
+      '/images/products/combo-packs/daily-morning-essentials-combo/main-800.webp'
     ],
     variants: [
       { id: 'v-cb1-std', weight: 'Standard Bundle', price: 299, mrp: 360, stock: 50, sku: 'DD-CMB-BRK-STD' }
@@ -1409,7 +1409,7 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Feast Bundles',
     images: [
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'
+      '/images/products/combo-packs/royal-shahi-feast-combo/main-800.webp'
     ],
     variants: [
       { id: 'v-cb2-std', weight: 'Family Feast Pack', price: 749, mrp: 940, stock: 40, sku: 'DD-CMB-SHH-STD' }
