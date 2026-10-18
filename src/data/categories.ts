@@ -6,7 +6,7 @@ export const CATEGORIES: Category[] = [
     name: 'Milk',
     slug: 'milk',
     iconName: 'Milk',
-    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/milk/shuddh-masala-badam-kesar-milk/main-800.webp',
     itemCount: 8,
     tagline: 'Farm-milked within 4 hours, untouched by hand',
     description: 'Raw chilled, pasteurized full cream, cow, buffalo and certified Gir cow A2 milk delivered fresh every morning.'
@@ -16,7 +16,7 @@ export const CATEGORIES: Category[] = [
     name: 'Desi Ghee',
     slug: 'ghee',
     iconName: 'Flame',
-    image: 'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/ghee/desi-a2-gir-cow-bilona-ghee/main-800.webp',
     itemCount: 7,
     tagline: 'Traditional Bilona & Vedic Churning',
     description: 'Golden, aromatic, granular ghee made from pure curd churning in clay pots over slow cow-dung fire.'
@@ -29,14 +29,14 @@ export const CATEGORIES: Category[] = [
     image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=600&q=80',
     itemCount: 5,
     tagline: 'White Makkhan & Cultured Cream Butter',
-    description: 'Fresh homemade style Safed Makkhan, salted table butter, and garlic-herb garlic butter.'
+    description: 'Fresh homemade style Safed Makkhan, salted table butter, and garlic-herb compound butter.'
   },
   {
     id: 'paneer',
     name: 'Paneer',
     slug: 'paneer',
     iconName: 'Layers',
-    image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/paneer/farm-fresh-malai-paneer/main-800.webp',
     itemCount: 6,
     tagline: 'Melt-in-mouth soft Malai & Low-fat Paneer',
     description: 'Crafted from pure whole milk, never rubbery, non-acidic and ultra moist for royal curries.'
@@ -46,7 +46,7 @@ export const CATEGORIES: Category[] = [
     name: 'Fresh Cream & Malai',
     slug: 'cream',
     iconName: 'Droplet',
-    image: 'https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/cream/pure-clotted-desi-malai/main-800.webp',
     itemCount: 4,
     tagline: 'Rich thick clotted malai & cooking cream',
     description: 'Naturally separated pure cream for rich curries, baking, desserts, and morning parathas.'
@@ -56,7 +56,7 @@ export const CATEGORIES: Category[] = [
     name: 'Curd & Dahi',
     slug: 'curd-dahi',
     iconName: 'CupSoda',
-    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80',
+    image: '/images/placeholders/category-curd-dahi.svg',
     itemCount: 5,
     tagline: 'Set Curd, Clay-pot Matka Dahi & Mishti Doi',
     description: 'Live probiotic cultures, thick creamy texture without gelatin or starch stabilizers.'
@@ -76,7 +76,7 @@ export const CATEGORIES: Category[] = [
     name: 'Pure Desi Mithai',
     slug: 'mithai',
     iconName: 'Sparkles',
-    image: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/mithai/shuddh-desi-ghee-kaju-katli/main-800.webp',
     itemCount: 9,
     tagline: 'Pure Ghee Sweets & Authentic Halwai Recipes',
     description: 'Kaju Katli, Gulab Jamun, Rasgulla, Motichoor Ladoo, and Mathura Peda made in 100% Shuddh Ghee.'
@@ -86,7 +86,7 @@ export const CATEGORIES: Category[] = [
     name: 'Combo Packs',
     slug: 'combo-packs',
     iconName: 'PackageCheck',
-    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/combo-packs/daily-morning-essentials-combo/main-800.webp',
     itemCount: 5,
     tagline: 'Weekly Dairy Bundles & Breakfast Savers',
     description: 'Save up to 25% with curated daily essentials: Milk + Dahi + Paneer + Butter combos.'
@@ -96,7 +96,7 @@ export const CATEGORIES: Category[] = [
     name: 'Gift Boxes',
     slug: 'gift-boxes',
     iconName: 'Gift',
-    image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80',
+    image: '/images/products/mithai/shuddh-desi-ghee-kaju-katli/packaging-800.webp',
     itemCount: 4,
     tagline: 'Festive & Celebration Hampers with Brass Matkas',
     description: 'Premium royal gift boxes packed with gold-foil sweets, A2 Ghee jars, and festive silver coins.'

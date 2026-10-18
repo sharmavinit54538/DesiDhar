@@ -10,7 +10,7 @@ export const HERO_BANNERS: HeroBanner[] = [
     link: '/category/ghee',
     bgColor: '#FFF3DC',
     bgGradient: 'from-amber-100 via-amber-50 to-orange-100',
-    image: 'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=1000&q=80',
+    image: '/images/products/ghee/desi-a2-gir-cow-bilona-ghee/main-1200.webp',
     highlightText: 'FLAT 20% OFF'
   },
   {
@@ -28,13 +28,13 @@ export const HERO_BANNERS: HeroBanner[] = [
   {
     id: 'banner-3',
     title: 'Melt-In-Mouth Royal Kaju Katli',
-    subtitle: 'Handcrafted with premium Goan cashew paste & 100% Shuddh Desi Ghee. No silver paper adulteration.',
+    subtitle: 'Handcrafted with premium Goan cashew paste & 100% Shuddh Desi Ghee. Pure silver leaf vark.',
     badge: '👑 ROYAL MITHAI COLLECTION',
     buttonText: 'Explore Pure Mithai',
     link: '/category/mithai',
     bgColor: '#FFF5F0',
     bgGradient: 'from-rose-100 via-amber-50 to-amber-100',
-    image: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=1000&q=80',
+    image: '/images/products/mithai/shuddh-desi-ghee-kaju-katli/main-1200.webp',
     highlightText: '100% DESI GHEE SWEETS'
   },
   {
@@ -46,7 +46,7 @@ export const HERO_BANNERS: HeroBanner[] = [
     link: '/category/paneer',
     bgColor: '#F0FDF4',
     bgGradient: 'from-emerald-100 via-green-50 to-amber-50',
-    image: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=1000&q=80',
+    image: '/images/products/paneer/farm-fresh-malai-paneer/main-1200.webp',
     highlightText: 'CUT FRESH TODAY'
   }
 ];
@@ -59,7 +59,7 @@ export const PROMO_DEALS = [
     dealPrice: 1299,
     savings: 351,
     endsInMinutes: 420,
-    image: 'https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=500&q=80'
+    image: '/images/products/combo-packs/royal-shahi-feast-combo/main-800.webp'
   },
   {
     id: 'deal-sweets-box',
@@ -68,6 +68,6 @@ export const PROMO_DEALS = [
     dealPrice: 799,
     savings: 191,
     endsInMinutes: 280,
-    image: 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=500&q=80'
+    image: '/images/products/mithai/shuddh-desi-ghee-kaju-katli/packaging-800.webp'
   }
 ];

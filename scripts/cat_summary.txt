@@ -1,0 +1,77 @@
+
+=== GHEE (7 products) ===
+  prod-ghee-1    | desi-a2-gir-cow-bilona-ghee              | /images/products/ghee/desi-a2-gir-cow-bilona-ghee/main-800.webp
+  prod-ghee-2    | organic-desi-cow-danedaar-ghee           | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-ghee-3    | pure-murrah-buffalo-ghee                 | https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80
+  prod-ghee-4    | vedic-cultured-grass-fed-cow-ghee        | https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80
+  prod-ghee-5    | brahmi-shankhpushpi-medhya-ghee          | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-ghee-6    | garlic-himalayan-herb-ghee               | https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80
+  prod-ghee-7    | royal-kesar-elaichi-dessert-ghee         | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+
+=== MILK (8 products) ===
+  prod-milk-1    | fresh-a2-gir-cow-raw-milk                | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+  prod-milk-2    | farm-fresh-full-cream-cow-milk           | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+  prod-milk-3    | pure-thick-buffalo-milk                  | https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80
+  prod-milk-4    | low-fat-toned-cow-milk                   | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+  prod-milk-5    | shuddh-masala-badam-kesar-milk           | /images/products/milk/shuddh-masala-badam-kesar-milk/main-800.webp
+  prod-milk-6    | golden-haldi-a2-immun-milk               | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+  prod-milk-7    | farm-fresh-pasteurized-gold-milk         | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+  prod-milk-8    | pure-raw-cow-colostrum-milk              | https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80
+
+=== BUTTER (5 products) ===
+  prod-butter-1  | desi-safed-makkhan                       | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-butter-2  | golden-table-butter-salted               | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-butter-3  | desi-garlic-coriander-butter             | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-butter-4  | artisanal-unsalted-sweet-cream-butter    | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+  prod-butter-5  | smoked-chilli-herb-makkhan               | https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=800&q=80
+
+=== PANEER (6 products) ===
+  prod-paneer-1  | farm-fresh-malai-paneer                  | /images/products/paneer/farm-fresh-malai-paneer/main-800.webp
+  prod-paneer-2  | pure-a2-gir-cow-paneer                   | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+  prod-paneer-3  | low-fat-high-protein-diet-paneer         | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+  prod-paneer-4  | jeera-mint-spiced-fresh-paneer           | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+  prod-paneer-5  | smoked-clay-oven-paneer-blocks           | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+  prod-paneer-6  | pure-buffalo-malai-paneer                | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+
+=== CREAM (4 products) ===
+  prod-cream-1   | pure-clotted-desi-malai                  | /images/products/cream/pure-clotted-desi-malai/main-800.webp
+  prod-cream-2   | fresh-dairy-cooking-cream                | https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80
+  prod-cream-3   | pure-heavy-whipping-cream                | https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80
+  prod-cream-4   | royal-kesar-dessert-malai                | https://images.unsplash.com/photo-1528751014936-863e6e7a319c?auto=format&fit=crop&w=800&q=80
+
+=== CURD-DAHI (5 products) ===
+  prod-dahi-1    | traditional-matka-curd                   | https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80
+  prod-dahi-2    | pure-cow-milk-thick-dahi                 | https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80
+  prod-dahi-3    | authentic-kolkata-baked-mishti-doi       | https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80
+  prod-dahi-4    | alphonso-mango-greek-dahi                | https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80
+  prod-dahi-5    | desi-tadka-masala-chaas-buttermilk       | https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80
+
+=== CHEESE (4 products) ===
+  prod-cheese-1  | fresh-desi-mozzarella-bocconcini         | https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80
+  prod-cheese-2  | desi-cow-milk-cheddar-block              | https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80
+  prod-cheese-3  | pure-milk-cheese-slices-cubes            | https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=800&q=80
+  prod-cheese-4  | artisanal-fresh-soft-chhena              | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+
+=== MITHAI (9 products) ===
+  prod-sweet-1   | shuddh-desi-ghee-kaju-katli              | /images/products/mithai/shuddh-desi-ghee-kaju-katli/main-800.webp
+  prod-sweet-2   | desi-ghee-gulab-jamun                    | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-3   | royal-kesari-rasmalai                    | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-4   | bengali-sponge-rasgulla                  | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-5   | shuddh-ghee-motichoor-ladoo              | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-6   | authentic-mathura-peda                   | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-7   | roasted-pista-khoya-barfi                | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-8   | flaky-desi-ghee-soan-papdi               | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-sweet-9   | royal-shahi-besan-ladoo                  | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+
+=== COMBO-PACKS (5 products) ===
+  prod-combo-1   | daily-morning-essentials-combo           | /images/products/combo-packs/daily-morning-essentials-combo/main-800.webp
+  prod-combo-2   | royal-shahi-feast-combo                  | /images/products/combo-packs/royal-shahi-feast-combo/main-800.webp
+  prod-combo-3   | sweet-celebration-duo-combo              | https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80
+  prod-combo-4   | ayurvedic-wellness-a2-bundle             | https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80
+  prod-combo-5   | dairy-protein-fitness-pack               | https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=80
+
+=== GIFT-BOXES (4 products) ===
+  prod-gift-1    | royal-shahi-heritage-brass-mithai-box    | https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80
+  prod-gift-2    | vedic-a2-ghee-raw-honey-wooden-box       | https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80
+  prod-gift-3    | utsav-grand-festive-sweets-dryfruits-box | https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80
+  prod-gift-4    | bandhan-artisan-sweet-trio-box           | https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80

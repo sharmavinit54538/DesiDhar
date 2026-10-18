@@ -23,7 +23,6 @@ import { NutritionFactsTable } from '../components/product/NutritionFactsTable';
 import { AllergenBadgeRow } from '../components/product/AllergenBadgeRow';
 import { ProductSpecificationsTable } from '../components/product/ProductSpecificationsTable';
 import { StickyActionBar } from '../components/common/StickyActionBar';
-import { getProductImagesBySlug } from '../data/productImages';
 import {
   Heart,
   ShoppingBag,
@@ -126,9 +125,6 @@ export const ProductDetailPage: React.FC = () => {
   const cartItem = items.find((i) => i.variantId === activeVariant.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
 
-  const productImages = getProductImagesBySlug(product.slug);
-  const displayImages = productImages.length > 0 ? productImages : product.images;
-
   const handleAddToCart = () => {
     addItem(
       {
@@ -137,7 +133,7 @@ export const ProductDetailPage: React.FC = () => {
         name: product.name,
         slug: product.slug,
         brand: product.brand,
-        image: typeof displayImages[0] === 'string' ? displayImages[0] : displayImages[0].src,
+        image: typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.src,
         weight: activeVariant.weight,
         price: activeVariant.price,
         mrp: activeVariant.mrp,
