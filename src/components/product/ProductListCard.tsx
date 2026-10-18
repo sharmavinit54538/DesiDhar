@@ -12,6 +12,8 @@ import { useUiStore } from '../../store/uiStore';
 import { Heart, ShoppingBag, Zap, CheckCircle2 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
+import { getPrimaryProductImage, handleImageError } from '../../utils/imageResolver';
+
 interface ProductListCardProps {
   product: Product;
 }
@@ -19,6 +21,8 @@ interface ProductListCardProps {
 export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const activeVariant = product.variants[selectedVariantIndex] || product.variants[0];
+
+  const primaryImage = getPrimaryProductImage(product, activeVariant.id);
 
   const { items, addItem, updateQuantity } = useCartStore();
   const { isInWishlist, toggleWishlist } = useWishlistStore();
@@ -31,15 +35,13 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    const firstImage = product.images[0];
-    const imageSrc = typeof firstImage === 'string' ? firstImage : firstImage?.src || '';
     addItem({
       productId: product.id,
       variantId: activeVariant.id,
       name: product.name,
       slug: product.slug,
       brand: product.brand,
-      image: imageSrc,
+      image: primaryImage.src,
       weight: activeVariant.weight,
       price: activeVariant.price,
       mrp: activeVariant.mrp,
@@ -55,8 +57,11 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
       <div className="relative w-full sm:w-44 h-44 sm:h-36 rounded-xl overflow-hidden bg-stone-50 shrink-0">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           <img
-            src={typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.src}
-            alt={product.name}
+            src={primaryImage.src}
+            srcSet={primaryImage.srcset}
+            sizes={primaryImage.sizes}
+            alt={primaryImage.alt}
+            onError={(e) => handleImageError(e, product.category)}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
         </Link>
@@ -122,11 +127,17 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
         </div>
 
         <div className="mt-2 flex items-center gap-3 text-[11px] text-emerald-800 font-medium">
-          <span className="flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Shelf Life: {product.shelfLife}
-          </span>
-          <span>•</span>
-          <span>{product.storage}</span>
+          {product.shelfLife && (
+            <>
+              <span className="flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Shelf Life: {product.shelfLife}
+              </span>
+              {product.storage && <span>•</span>}
+            </>
+          )}
+          {product.storage && (
+            <span>{typeof product.storage === 'string' ? product.storage : product.storage.storageInstructions}</span>
+          )}
         </div>
       </div>
 

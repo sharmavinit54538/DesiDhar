@@ -12,6 +12,12 @@ import { useUiStore } from '../../store/uiStore';
 import { Heart, ShoppingBag, Zap } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
+import {
+  getPrimaryProductImage,
+  getSecondaryProductImage,
+  handleImageError,
+} from '../../utils/imageResolver';
+
 interface ProductCardProps {
   product: Product;
   className?: string;
@@ -21,6 +27,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
   // Active variant state (defaults to primary/first variant)
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const activeVariant = product.variants[selectedVariantIndex] || product.variants[0];
+
+  const primaryImage = getPrimaryProductImage(product, activeVariant.id);
+  const secondaryImage = getSecondaryProductImage(product);
 
   const { items, addItem, updateQuantity } = useCartStore();
   const { isInWishlist, toggleWishlist } = useWishlistStore();
@@ -43,7 +52,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
       name: product.name,
       slug: product.slug,
       brand: product.brand,
-      image: typeof product.images[0] === 'string' ? product.images[0] : (product.images[0]?.src || ''),
+      image: primaryImage.src,
       weight: activeVariant.weight,
       price: activeVariant.price,
       mrp: activeVariant.mrp,
@@ -84,18 +93,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
       <div className="relative aspect-square overflow-hidden bg-stone-50">
         <Link to={`/product/${product.slug}`} className="block w-full h-full relative">
           <img
-            src={typeof product.images[0] === 'string' ? product.images[0] : (product.images[0]?.src || '/images/placeholder.webp')}
-            alt={product.name}
+            src={primaryImage.src}
+            srcSet={primaryImage.srcset}
+            sizes={primaryImage.sizes}
+            alt={primaryImage.alt}
+            onError={(e) => handleImageError(e, product.category)}
             loading="lazy"
             className={cn(
               'w-full h-full object-cover transition-all duration-300',
-              product.images.length > 1 ? 'group-hover:opacity-0' : 'group-hover:scale-105'
+              secondaryImage ? 'group-hover:opacity-0' : 'group-hover:scale-105'
             )}
           />
-          {product.images.length > 1 && (
+          {secondaryImage && (
             <img
-              src={typeof product.images[1] === 'string' ? product.images[1] : product.images[1]?.src}
-              alt={`${product.name} alternate shot`}
+              src={secondaryImage.src}
+              srcSet={secondaryImage.srcset}
+              sizes={secondaryImage.sizes}
+              alt={secondaryImage.alt}
+              onError={(e) => handleImageError(e, product.category)}
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             />
