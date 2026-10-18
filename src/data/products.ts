@@ -1104,32 +1104,58 @@ export const PRODUCTS: Product[] = [
     id: 'prod-sweet-1',
     slug: 'shuddh-desi-ghee-kaju-katli',
     name: 'DesiDhar Shuddh Desi Ghee Diamond Kaju Katli',
+    hindiName: 'काजू कतली',
     brand: 'DesiDhar Shuddh',
     category: 'mithai',
     subcategory: 'Cashew Sweets',
+    sweetType: 'barfi',
+    originRegion: 'Rajasthan & North India',
     images: [
-      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80'
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/main-800.webp',
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/closeup-800.webp',
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/packaging-800.webp',
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/serving-800.webp',
+      '/images/products/mithai/shuddh-desi-ghee-kaju-katli/size-reference-800.webp',
     ],
     variants: [
-      { id: 'v-s1-250', weight: '250g Box', price: 295, mrp: 350, stock: 65, sku: 'DD-SWT-KAJU-250' },
-      { id: 'v-s1-500', weight: '500g Festive Box', price: 565, mrp: 680, stock: 55, sku: 'DD-SWT-KAJU-500' },
-      { id: 'v-s1-1000', weight: '1 kg Royal Gift Box', price: 1090, mrp: 1350, stock: 35, sku: 'DD-SWT-KAJU-1000' }
+      { id: 'v-s1-250', weight: '250g Box (10-12 pcs)', price: 295, mrp: 350, stock: 65, sku: 'DD-SWT-KAJU-250' },
+      { id: 'v-s1-500', weight: '500g Festive Box (20-24 pcs)', price: 565, mrp: 680, stock: 55, sku: 'DD-SWT-KAJU-500' },
+      { id: 'v-s1-1000', weight: '1 kg Royal Gift Box (40-48 pcs)', price: 1090, mrp: 1350, stock: 35, sku: 'DD-SWT-KAJU-1000' }
     ],
     rating: 4.9,
     reviewCount: 420,
-    tags: ['Bestseller', 'Festive Special', 'Pure Cashew', 'Deal of Day'],
+    tags: ['Bestseller', 'Festive Special', 'Pure Cashew', 'Deal of Day', 'A2 Pure Ghee'],
+    highlights: [
+      { text: 'Made with 75% whole premium Goan cashews' },
+      { text: 'Cooked in authentic DesiDhar Bilona Cow Ghee' },
+      { text: 'Genuine 100% vegetarian silver leaf vark' },
+      { text: 'Zero peanut adulteration or flour mixing' },
+      { text: 'Freshly batch-crafted daily' }
+    ],
     isBestseller: true,
     isDeal: true,
     dealEndsAt: '2026-10-31T23:59:59',
     isVeg: true,
     fssaiNumber: '10020011002341',
-    shortDescription: '75% pure premium Goan cashew paste cooked in DesiDhar Bilona Ghee. Zero artificial silver foil or peanut mixing.',
-    description: 'Thin, melt-in-mouth diamond cuts made purely from premium whole cashew nuts and clarified butter. We refuse to use cheap silver paper (vark) or flour adulteration. Just pristine, nutty, silky cashew elegance.',
-    ingredients: 'Goan Cashews (75%), Cane Sugar, DesiDhar Cow Ghee, Cardamom.',
-    nutrition: { 'Energy': '478 kcal', 'Protein': '11.2 g', 'Fat': '24.5 g', 'Carbohydrates': '52.0 g' },
-    shelfLife: '30 Days from manufacturing',
-    storage: 'Store in an airtight box in a cool, dry place. Do not refrigerate.'
+    shortDescription: '75% pure premium Goan cashew paste slow-simmered in DesiDhar Vedic Bilona Ghee. Melt-in-mouth diamond cuts.',
+    description: 'Thin, melt-in-mouth diamond cuts crafted exclusively from premium whole cashew nuts, sulfur-free organic cane sugar, and pure A2 cow ghee. Finished with pristine 100% vegetarian certified silver leaf vark and garnished with pistachios. No peanuts, no flour, no artificial flavorings — just pure, silky, nutty royal indulgence.',
+    ingredients: 'Whole Goan Cashews (75%), Organic Cane Sugar, DesiDhar Vedic Cow Ghee, Vegetarian Silver Leaf (Vark), Green Cardamom.',
+    nutrition: {
+      'Energy': '478 kcal',
+      'Protein': '11.2 g',
+      'Total Fat': '24.5 g',
+      'Saturated Fat': '4.8 g',
+      'Carbohydrates': '52.0 g',
+      'Sugars': '38.2 g',
+      'Sodium': '18 mg'
+    },
+    shelfLife: '30 Days from packing date',
+    storage: 'Store in an airtight container in a cool, dry place away from sunlight. Do not refrigerate to preserve soft texture.',
+    faqs: [
+      { question: 'Is the silver foil (vark) vegetarian?', answer: 'Yes, 100%. We use certified machine-beaten vegetarian silver foil with zero animal involvement.' },
+      { question: 'Is there any peanut or flour added?', answer: 'Strictly zero. Only pure Grade-A Goan cashew nuts and pure desi ghee.' },
+      { question: 'How long does Kaju Katli stay fresh?', answer: 'Up to 30 days at room temperature when stored in an airtight box.' }
+    ]
   },
   {
     id: 'prod-sweet-2',

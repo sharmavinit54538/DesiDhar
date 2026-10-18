@@ -43,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
       name: product.name,
       slug: product.slug,
       brand: product.brand,
-      image: product.images[0],
+      image: typeof product.images[0] === 'string' ? product.images[0] : (product.images[0]?.src || ''),
       weight: activeVariant.weight,
       price: activeVariant.price,
       mrp: activeVariant.mrp,
@@ -82,13 +82,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
     >
       {/* Top Media Area */}
       <div className="relative aspect-square overflow-hidden bg-stone-50">
-        <Link to={`/product/${product.slug}`} className="block w-full h-full">
+        <Link to={`/product/${product.slug}`} className="block w-full h-full relative">
           <img
-            src={product.images[0]}
+            src={typeof product.images[0] === 'string' ? product.images[0] : (product.images[0]?.src || '/images/placeholder.webp')}
             alt={product.name}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className={cn(
+              'w-full h-full object-cover transition-all duration-300',
+              product.images.length > 1 ? 'group-hover:opacity-0' : 'group-hover:scale-105'
+            )}
           />
+          {product.images.length > 1 && (
+            <img
+              src={typeof product.images[1] === 'string' ? product.images[1] : product.images[1]?.src}
+              alt={`${product.name} alternate shot`}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            />
+          )}
         </Link>
 
         {/* Floating Badges */}
