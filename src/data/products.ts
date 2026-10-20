@@ -1170,7 +1170,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Mawa Sweets',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/desi-ghee-gulab-jamun/main-800.webp',
+      '/images/products/mithai/desi-ghee-gulab-jamun/closeup-800.webp',
+      '/images/products/mithai/desi-ghee-gulab-jamun/serving-800.webp'
     ],
     variants: [
       { id: 'v-s2-500', weight: '500g Container (12 pcs)', price: 245, mrp: 295, stock: 50, sku: 'DD-SWT-GJ-500' },
@@ -1198,7 +1200,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Chhena Sweets',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/royal-kesari-rasmalai/main-800.webp',
+      '/images/products/mithai/royal-kesari-rasmalai/closeup-800.webp',
+      '/images/products/mithai/royal-kesari-rasmalai/serving-800.webp'
     ],
     variants: [
       { id: 'v-s3-500', weight: '500g (5 Large Pcs)', price: 295, mrp: 350, stock: 45, sku: 'DD-SWT-RM-500' },
@@ -1226,7 +1230,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Chhena Sweets',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/bengali-sponge-rasgulla/main-800.webp',
+      '/images/products/mithai/bengali-sponge-rasgulla/closeup-800.webp',
+      '/images/products/mithai/bengali-sponge-rasgulla/serving-800.webp'
     ],
     variants: [
       { id: 'v-s4-500', weight: '500g Can (8 Pcs)', price: 185, mrp: 220, stock: 60, sku: 'DD-SWT-RSG-500' },
@@ -1252,7 +1258,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Ladoo',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/shuddh-ghee-motichoor-ladoo/main-800.webp',
+      '/images/products/mithai/shuddh-ghee-motichoor-ladoo/closeup-800.webp',
+      '/images/products/mithai/shuddh-ghee-motichoor-ladoo/serving-800.webp'
     ],
     variants: [
       { id: 'v-s5-250', weight: '250g Box', price: 195, mrp: 235, stock: 60, sku: 'DD-SWT-MOTI-250' },
@@ -1280,7 +1288,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Peda & Barfi',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/authentic-mathura-peda/main-800.webp',
+      '/images/products/mithai/authentic-mathura-peda/closeup-800.webp',
+      '/images/products/mithai/authentic-mathura-peda/serving-800.webp'
     ],
     variants: [
       { id: 'v-s6-250', weight: '250g Box', price: 210, mrp: 250, stock: 45, sku: 'DD-SWT-PEDA-250' },
