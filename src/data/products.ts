@@ -87,7 +87,9 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Buffalo Ghee',
     images: [
-      '/images/placeholders/category-ghee.svg'
+      '/images/products/ghee/pure-murrah-buffalo-ghee/main-800.webp',
+      '/images/products/ghee/pure-murrah-buffalo-ghee/closeup-800.webp',
+      '/images/products/ghee/pure-murrah-buffalo-ghee/serving-800.webp'
     ],
     variants: [
       { id: 'v-g3-500', weight: '500ml', price: 469, mrp: 550, stock: 25, sku: 'DD-GHEE-BUF-500' },
@@ -113,7 +115,9 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'A2 Cow Ghee',
     images: [
-      '/images/placeholders/category-ghee.svg'
+      '/images/products/ghee/vedic-cultured-grass-fed-cow-ghee/main-800.webp',
+      '/images/products/ghee/vedic-cultured-grass-fed-cow-ghee/closeup-800.webp',
+      '/images/products/ghee/vedic-cultured-grass-fed-cow-ghee/serving-800.webp'
     ],
     variants: [
       { id: 'v-g4-500', weight: '500ml', price: 950, mrp: 1200, stock: 20, sku: 'DD-GHEE-HIM-500' },
@@ -139,7 +143,9 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Infused Ghee',
     images: [
-      '/images/placeholders/category-ghee.svg'
+      '/images/products/ghee/brahmi-shankhpushpi-medhya-ghee/main-800.webp',
+      '/images/products/ghee/brahmi-shankhpushpi-medhya-ghee/closeup-800.webp',
+      '/images/products/ghee/brahmi-shankhpushpi-medhya-ghee/serving-800.webp'
     ],
     variants: [
       { id: 'v-g5-250', weight: '250ml', price: 549, mrp: 699, stock: 18, sku: 'DD-GHEE-BRM-250' },
@@ -318,7 +324,9 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Toned Milk',
     images: [
-      '/images/placeholders/category-milk.svg'
+      '/images/products/milk/low-fat-toned-cow-milk/main-800.webp',
+      '/images/products/milk/low-fat-toned-cow-milk/closeup-800.webp',
+      '/images/products/milk/low-fat-toned-cow-milk/serving-800.webp'
     ],
     variants: [
       { id: 'v-m4-1000', weight: '1 Litre', price: 58, mrp: 65, stock: 80, sku: 'DD-MILK-TONED-1L' }
@@ -479,7 +487,9 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Table Butter',
     images: [
-      '/images/placeholders/category-butter.svg'
+      '/images/products/butter/golden-table-butter-salted/main-800.webp',
+      '/images/products/butter/golden-table-butter-salted/closeup-800.webp',
+      '/images/products/butter/golden-table-butter-salted/serving-800.webp'
     ],
     variants: [
       { id: 'v-b2-100', weight: '100g Bar', price: 62, mrp: 68, stock: 90, sku: 'DD-BTR-SLT-100' },
@@ -505,7 +515,9 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Gourmet Butter',
     images: [
-      '/images/placeholders/category-butter.svg'
+      '/images/products/butter/desi-garlic-coriander-butter/main-800.webp',
+      '/images/products/butter/desi-garlic-coriander-butter/closeup-800.webp',
+      '/images/products/butter/desi-garlic-coriander-butter/serving-800.webp'
     ],
     variants: [
       { id: 'v-b3-200', weight: '200g Tub', price: 189, mrp: 230, stock: 35, sku: 'DD-BTR-GAR-200' }
@@ -530,7 +542,9 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Baking Butter',
     images: [
-      '/images/placeholders/category-butter.svg'
+      '/images/products/butter/artisanal-unsalted-sweet-cream-butter/main-800.webp',
+      '/images/products/butter/artisanal-unsalted-sweet-cream-butter/closeup-800.webp',
+      '/images/products/butter/artisanal-unsalted-sweet-cream-butter/serving-800.webp'
     ],
     variants: [
       { id: 'v-b4-250', weight: '250g Block', price: 175, mrp: 210, stock: 30, sku: 'DD-BTR-UNS-250' },
@@ -556,7 +570,9 @@ export const PRODUCTS: Product[] = [
     category: 'butter',
     subcategory: 'Gourmet Butter',
     images: [
-      '/images/placeholders/category-butter.svg'
+      '/images/products/butter/smoked-chilli-herb-makkhan/main-800.webp',
+      '/images/products/butter/smoked-chilli-herb-makkhan/closeup-800.webp',
+      '/images/products/butter/smoked-chilli-herb-makkhan/serving-800.webp'
     ],
     variants: [
       { id: 'v-b5-200', weight: '200g Tub', price: 195, mrp: 240, stock: 28, sku: 'DD-BTR-SMK-200' }
@@ -680,7 +696,9 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Flavored Paneer',
     images: [
-      '/images/placeholders/category-paneer.svg'
+      '/images/products/paneer/jeera-mint-spiced-fresh-paneer/main-800.webp',
+      '/images/products/paneer/jeera-mint-spiced-fresh-paneer/closeup-800.webp',
+      '/images/products/paneer/jeera-mint-spiced-fresh-paneer/serving-800.webp'
     ],
     variants: [
       { id: 'v-p4-250', weight: '250g Block', price: 145, mrp: 175, stock: 35, sku: 'DD-PNR-JRA-250' }
@@ -706,7 +724,9 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Gourmet Paneer',
     images: [
-      '/images/placeholders/category-paneer.svg'
+      '/images/products/paneer/smoked-clay-oven-paneer-blocks/main-800.webp',
+      '/images/products/paneer/smoked-clay-oven-paneer-blocks/closeup-800.webp',
+      '/images/products/paneer/smoked-clay-oven-paneer-blocks/serving-800.webp'
     ],
     variants: [
       { id: 'v-p5-250', weight: '250g Pre-cut Cubes', price: 155, mrp: 190, stock: 30, sku: 'DD-PNR-SMK-250' }
@@ -788,7 +808,9 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Cooking Cream',
     images: [
-      '/images/placeholders/category-cream.svg'
+      '/images/products/cream/fresh-dairy-cooking-cream/main-800.webp',
+      '/images/products/cream/fresh-dairy-cooking-cream/closeup-800.webp',
+      '/images/products/cream/fresh-dairy-cooking-cream/serving-800.webp'
     ],
     variants: [
       { id: 'v-c2-250', weight: '250ml Pack', price: 95, mrp: 115, stock: 65, sku: 'DD-CRM-CK-250' },
@@ -816,7 +838,9 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Whipping Cream',
     images: [
-      '/images/placeholders/category-cream.svg'
+      '/images/products/cream/pure-heavy-whipping-cream/main-800.webp',
+      '/images/products/cream/pure-heavy-whipping-cream/closeup-800.webp',
+      '/images/products/cream/pure-heavy-whipping-cream/serving-800.webp'
     ],
     variants: [
       { id: 'v-c3-500', weight: '500ml Carton', price: 220, mrp: 265, stock: 35, sku: 'DD-CRM-WHP-500' }
@@ -841,7 +865,9 @@ export const PRODUCTS: Product[] = [
     category: 'cream',
     subcategory: 'Flavored Malai',
     images: [
-      '/images/placeholders/category-cream.svg'
+      '/images/products/cream/royal-kesar-dessert-malai/main-800.webp',
+      '/images/products/cream/royal-kesar-dessert-malai/closeup-800.webp',
+      '/images/products/cream/royal-kesar-dessert-malai/serving-800.webp'
     ],
     variants: [
       { id: 'v-c4-200', weight: '200g Tub', price: 175, mrp: 215, stock: 25, sku: 'DD-CRM-KSR-200' }
