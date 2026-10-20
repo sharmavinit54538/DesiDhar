@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
 import type { Product, Category } from '../types';
 import { useFilterStore } from '../store/filterStore';
 import { useUiStore } from '../store/uiStore';
-import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { FilterSidebar } from '../components/product/FilterSidebar';
 import { SortBar } from '../components/product/SortBar';
 import { ActiveFilterChips } from '../components/product/ActiveFilterChips';
@@ -14,9 +13,10 @@ import { ProductListCard } from '../components/product/ProductListCard';
 import { ProductCardSkeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { Drawer } from '../components/common/Drawer';
-import { PackageOpen, Sparkles } from 'lucide-react';
+import { PackageOpen, Sparkles, ArrowLeft } from 'lucide-react';
 
 export const ProductListingPage: React.FC = () => {
+  const navigate = useNavigate();
   const { categorySlug } = useParams<{ categorySlug?: string }>();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
@@ -102,12 +102,13 @@ export const ProductListingPage: React.FC = () => {
     ? currentCategory.name
     : 'All Pure Dairy & Sweets';
 
-  const breadcrumbs = [
-    { label: 'Shop', path: '/category/all' },
-    ...(currentCategory ? [{ label: currentCategory.name }] : []),
-    ...(searchQuery ? [{ label: `Search: "${searchQuery}"` }] : []),
-    ...(isDealOnly ? [{ label: 'Deals of the Day' }] : []),
-  ];
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <>
@@ -120,7 +121,15 @@ export const ProductListingPage: React.FC = () => {
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <Breadcrumbs items={breadcrumbs} className="mb-4" />
+        <button
+          type="button"
+          onClick={handleBack}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-stone-700 bg-white hover:bg-amber-50 hover:text-amber-900 border border-stone-200/80 shadow-xs transition-all mb-4 cursor-pointer group"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-stone-500 group-hover:text-amber-800" />
+          <span>Back</span>
+        </button>
 
         {/* Category Header Banner (if browsing a specific category) */}
         {currentCategory && (
