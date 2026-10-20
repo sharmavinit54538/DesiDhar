@@ -289,7 +289,9 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Buffalo Milk',
     images: [
-      '/images/placeholders/category-milk.svg'
+      '/images/products/milk/pure-thick-buffalo-milk/main-800.webp',
+      '/images/products/milk/pure-thick-buffalo-milk/serving-800.webp',
+      '/images/products/milk/pure-thick-buffalo-milk/closeup-800.webp'
     ],
     variants: [
       { id: 'v-m3-1000', weight: '1 Litre Pouch', price: 78, mrp: 86, stock: 150, sku: 'DD-MILK-BUF-1L' },
@@ -866,7 +868,10 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Matka Dahi',
     images: [
-      '/images/placeholders/category-curd-dahi.svg'
+      '/images/products/curd-dahi/traditional-matka-curd/main-800.webp',
+      '/images/products/curd-dahi/traditional-matka-curd/closeup-800.webp',
+      '/images/products/curd-dahi/traditional-matka-curd/packaging-800.webp',
+      '/images/products/curd-dahi/traditional-matka-curd/serving-800.webp'
     ],
     variants: [
       { id: 'v-d1-400', weight: '400g Earthen Matka', price: 65, mrp: 75, stock: 85, sku: 'DD-DAHI-MTK-400' },
@@ -1327,7 +1332,10 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Flaky Mithai',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/flaky-desi-ghee-soan-papdi/main-800.webp',
+      '/images/products/mithai/flaky-desi-ghee-soan-papdi/closeup-800.webp',
+      '/images/products/mithai/flaky-desi-ghee-soan-papdi/packaging-800.webp',
+      '/images/products/mithai/flaky-desi-ghee-soan-papdi/serving-800.webp'
     ],
     variants: [
       { id: 'v-s8-250', weight: '250g Box', price: 165, mrp: 195, stock: 70, sku: 'DD-SWT-SOAN-250' },
@@ -1460,7 +1468,9 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Wellness Bundles',
     images: [
-      '/images/placeholders/category-combo-packs.svg'
+      '/images/products/combo-packs/ayurvedic-wellness-a2-bundle/main-800.webp',
+      '/images/products/combo-packs/ayurvedic-wellness-a2-bundle/ghee-800.webp',
+      '/images/products/combo-packs/ayurvedic-wellness-a2-bundle/milk-800.webp'
     ],
     variants: [
       { id: 'v-cb4-std', weight: 'Wellness Pack', price: 1899, mrp: 2390, stock: 25, sku: 'DD-CMB-AYU-STD' }
@@ -1485,7 +1495,9 @@ export const PRODUCTS: Product[] = [
     category: 'combo-packs',
     subcategory: 'Fitness Bundles',
     images: [
-      '/images/placeholders/category-combo-packs.svg'
+      '/images/products/combo-packs/dairy-protein-fitness-pack/main-800.webp',
+      '/images/products/combo-packs/dairy-protein-fitness-pack/paneer-800.webp',
+      '/images/products/combo-packs/dairy-protein-fitness-pack/closeup-800.webp'
     ],
     variants: [
       { id: 'v-cb5-std', weight: 'Weekly Fitness Pack', price: 449, mrp: 545, stock: 35, sku: 'DD-CMB-FIT-STD' }

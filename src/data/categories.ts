@@ -56,7 +56,7 @@ export const CATEGORIES: Category[] = [
     name: 'Curd & Dahi',
     slug: 'curd-dahi',
     iconName: 'CupSoda',
-    image: '/images/placeholders/category-curd-dahi.svg',
+    image: '/images/products/curd-dahi/traditional-matka-curd/main-800.webp',
     itemCount: 5,
     tagline: 'Set Curd, Clay-pot Matka Dahi & Mishti Doi',
     description: 'Live probiotic cultures, thick creamy texture without gelatin or starch stabilizers.'
