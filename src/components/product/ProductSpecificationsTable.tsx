@@ -11,6 +11,16 @@ export const ProductSpecificationsTable: React.FC<ProductSpecificationsTableProp
   product,
   activeVariant,
 }) => {
+  const shelfLifeVal =
+    product.shelfLife ||
+    (typeof product.storage === 'object' ? product.storage?.shelfLifeText : undefined) ||
+    '30 Days from Packing';
+
+  const storageVal =
+    typeof product.storage === 'string'
+      ? product.storage
+      : product.storage?.storageInstructions || 'Cool, dry, hygienic place away from sunlight';
+
   const specs = [
     { label: 'Brand', value: product.brand },
     { label: 'Hindi Name', value: product.hindiName || '—' },
@@ -21,8 +31,8 @@ export const ProductSpecificationsTable: React.FC<ProductSpecificationsTableProp
     { label: 'Net Content', value: activeVariant.weight },
     { label: 'Selected SKU', value: activeVariant.sku },
     { label: 'FSSAI License No.', value: `Lic. #${product.fssaiNumber || '10020011002341'}` },
-    { label: 'Shelf Life', value: product.shelfLife || '30 Days from Packing' },
-    { label: 'Storage Instructions', value: product.storage || 'Cool, dry, hygienic place away from sunlight' },
+    { label: 'Shelf Life', value: shelfLifeVal },
+    { label: 'Storage Instructions', value: storageVal },
     { label: 'HSN Code (GST)', value: 'HSN 2106 / 0405 (5% GST Inclusive - Sample)' },
     { label: 'Country of Origin', value: 'India (Bharat)' },
     { label: 'Manufacturer / Packer', value: 'DesiDhar Dairy Hub, Mathura Road, NCR 110001' },

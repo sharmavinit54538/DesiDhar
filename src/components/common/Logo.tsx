@@ -36,12 +36,12 @@ export const Logo: React.FC<LogoProps> = ({
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-xs">
           <defs>
             <linearGradient id="logoMatkaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#F59E0B" />
-              <stop offset="100%" stop-color="#B45309" />
+              <stop offset="0%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#B45309" />
             </linearGradient>
             <linearGradient id="logoCreamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#FFFFFF" />
-              <stop offset="100%" stop-color="#FFF8EC" />
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="100%" stopColor="#FFF8EC" />
             </linearGradient>
           </defs>
           {/* Matka pot */}

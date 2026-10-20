@@ -125,6 +125,8 @@ export const ProductDetailPage: React.FC = () => {
   const cartItem = items.find((i) => i.variantId === activeVariant.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
 
+  const displayImages = product.images && product.images.length > 0 ? product.images : [];
+
   const handleAddToCart = () => {
     addItem(
       {
@@ -252,15 +254,18 @@ export const ProductDetailPage: React.FC = () => {
               {/* Highlights pills */}
               {product.highlights && product.highlights.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2.5">
-                  {product.highlights.map((hl) => (
-                    <span
-                      key={hl}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md"
-                    >
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      {hl}
-                    </span>
-                  ))}
+                  {product.highlights.map((hl, i) => {
+                    const text = typeof hl === 'string' ? hl : hl.text;
+                    return (
+                      <span
+                        key={text || i}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        {text}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
 
@@ -513,19 +518,38 @@ export const ProductDetailPage: React.FC = () => {
                     Ingredients
                   </h4>
                   <p className="text-xs sm:text-sm text-stone-800 font-medium">
-                    {product.ingredients || '100% Pure Natural Farm Dairy.'}
+                    {typeof product.ingredients === 'string'
+                      ? product.ingredients
+                      : Array.isArray(product.ingredients)
+                        ? product.ingredients.map((ing) => ing.name).join(', ')
+                        : '100% Pure Natural Farm Dairy.'}
                   </p>
                 </div>
 
                 {/* Allergen Badge Row */}
-                <AllergenBadgeRow allergens={product.allergens} ingredientsText={product.ingredients} />
+                <AllergenBadgeRow
+                  allergens={product.allergens}
+                  ingredientsText={
+                    typeof product.ingredients === 'string'
+                      ? product.ingredients
+                      : Array.isArray(product.ingredients)
+                        ? product.ingredients.map((ing) => ing.name).join(', ')
+                        : undefined
+                  }
+                />
 
                 {/* Nutrition Facts Table */}
-                <NutritionFactsTable
-                  nutrition={product.nutrition}
-                  servingSize={product.category === 'milk' ? '100ml' : '100g'}
-                  isSampleData={false}
-                />
+                {product.nutrition ? (
+                  <NutritionFactsTable
+                    nutrition={product.nutrition}
+                    servingSize={product.category === 'milk' ? '100ml' : '100g'}
+                    isSampleData={false}
+                  />
+                ) : (
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 text-stone-500 text-xs">
+                    Standard dairy nutritional parameters available on batch packaging.
+                  </div>
+                )}
               </div>
             )}
 
@@ -534,11 +558,20 @@ export const ProductDetailPage: React.FC = () => {
               <div className="space-y-4 max-w-2xl text-xs sm:text-sm">
                 <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200">
                   <h4 className="font-bold text-[#4A2C17] mb-1">Shelf Life</h4>
-                  <p className="text-stone-600">{product.shelfLife}</p>
+                  <p className="text-stone-600">
+                    {product.shelfLife ||
+                      (typeof product.storage === 'object' ? product.storage?.shelfLifeText : undefined) ||
+                      'Best before indicated on package.'}
+                  </p>
                 </div>
                 <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200">
                   <h4 className="font-bold text-[#4A2C17] mb-1">Storage Guidelines</h4>
-                  <p className="text-stone-600">{product.storage}</p>
+                  <p className="text-stone-600">
+                    {typeof product.storage === 'string'
+                      ? product.storage
+                      : product.storage?.storageInstructions ||
+                        'Store in a cool, dry place. Keep refrigerated once opened.'}
+                  </p>
                 </div>
               </div>
             )}
