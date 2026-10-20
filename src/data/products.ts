@@ -626,7 +626,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'A2 Paneer',
     images: [
-      '/images/placeholders/category-paneer.svg'
+      '/images/products/paneer/pure-a2-gir-cow-paneer/main-800.webp'
     ],
     variants: [
       { id: 'v-p2-200', weight: '200g Block', price: 155, mrp: 185, stock: 50, sku: 'DD-PNR-A2-200' },
@@ -653,7 +653,7 @@ export const PRODUCTS: Product[] = [
     category: 'paneer',
     subcategory: 'Diet Paneer',
     images: [
-      '/images/placeholders/category-paneer.svg'
+      '/images/products/paneer/low-fat-high-protein-diet-paneer/main-800.webp'
     ],
     variants: [
       { id: 'v-p3-200', weight: '200g Pack', price: 115, mrp: 135, stock: 60, sku: 'DD-PNR-DIET-200' },
@@ -1306,7 +1306,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Peda & Barfi',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/roasted-pista-khoya-barfi/main-800.webp',
+      '/images/products/mithai/roasted-pista-khoya-barfi/closeup-800.webp',
+      '/images/products/mithai/roasted-pista-khoya-barfi/serving-800.webp'
     ],
     variants: [
       { id: 'v-s7-250', weight: '250g Box', price: 235, mrp: 280, stock: 40, sku: 'DD-SWT-BRF-250' },
