@@ -57,7 +57,10 @@ export const PRODUCTS: Product[] = [
     category: 'ghee',
     subcategory: 'Cow Ghee',
     images: [
-      '/images/placeholders/category-ghee.svg'
+      '/images/products/ghee/organic-desi-cow-danedaar-ghee/main-800.webp',
+      '/images/products/ghee/organic-desi-cow-danedaar-ghee/closeup-800.webp',
+      '/images/products/ghee/organic-desi-cow-danedaar-ghee/packaging-800.webp',
+      '/images/products/ghee/organic-desi-cow-danedaar-ghee/serving-800.webp'
     ],
     variants: [
       { id: 'v-g2-500', weight: '500ml', price: 449, mrp: 549, stock: 50, sku: 'DD-GHEE-COW-500' },
@@ -255,7 +258,10 @@ export const PRODUCTS: Product[] = [
     category: 'milk',
     subcategory: 'Cow Milk',
     images: [
-      '/images/placeholders/category-milk.svg'
+      '/images/products/milk/farm-fresh-full-cream-cow-milk/main-800.webp',
+      '/images/products/milk/farm-fresh-full-cream-cow-milk/serving-800.webp',
+      '/images/products/milk/farm-fresh-full-cream-cow-milk/closeup-800.webp',
+      '/images/products/milk/farm-fresh-full-cream-cow-milk/packaging-800.webp'
     ],
     variants: [
       { id: 'v-m2-1000', weight: '1 Litre Pouch', price: 68, mrp: 75, stock: 200, sku: 'DD-MILK-COW-1L' },
