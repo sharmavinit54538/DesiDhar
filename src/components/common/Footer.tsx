@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Logo } from './Logo';
+import { Logo, LogoIcon } from './Logo';
 import { useUiStore } from '../../store/uiStore';
 import {
   ShieldCheck,
   Truck,
-  Sparkles,
   PhoneCall,
   Mail,
   MapPin,
@@ -46,8 +45,8 @@ export const Footer: React.FC = () => {
         {/* 4 Pillars of DesiDhar Trust */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pb-8 md:pb-12 border-b border-stone-800 text-stone-300">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center p-1.5 shrink-0">
+              <LogoIcon className="w-full h-full" />
             </div>
             <div>
               <h4 className="text-xs sm:text-sm font-bold text-white font-heading">100% Khaalis Desi</h4>

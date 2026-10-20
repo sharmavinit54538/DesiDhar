@@ -7,7 +7,6 @@ import { formatINR, calculateDiscountPercent } from '../utils/formatters';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useUiStore } from '../store/uiStore';
-import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { ImageGallery } from '../components/product/ImageGallery';
 import { RatingBadge } from '../components/common/RatingBadge';
 import { VegBadge } from '../components/common/VegBadge';
@@ -32,6 +31,7 @@ import {
   ShieldCheck,
   Plus,
   ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
 
 export const ProductDetailPage: React.FC = () => {
@@ -156,11 +156,13 @@ export const ProductDetailPage: React.FC = () => {
     setReviews([newReview, ...reviews]);
   };
 
-  const breadcrumbs = [
-    { label: 'Shop', path: '/category/all' },
-    { label: product.category, path: `/category/${product.category}` },
-    { label: product.name },
-  ];
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate(`/category/${product.category}`);
+    }
+  };
 
   return (
     <>
@@ -170,7 +172,15 @@ export const ProductDetailPage: React.FC = () => {
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <Breadcrumbs items={breadcrumbs} className="mb-4" />
+        <button
+          type="button"
+          onClick={handleBack}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-stone-700 bg-white hover:bg-amber-50 hover:text-amber-900 border border-stone-200/80 shadow-xs transition-all mb-4 cursor-pointer group"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5 text-stone-500 group-hover:text-amber-800" />
+          <span>Back</span>
+        </button>
 
         {/* Main Product Showcase (Left Media, Right Details) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
