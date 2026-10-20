@@ -1407,7 +1407,9 @@ export const PRODUCTS: Product[] = [
     category: 'mithai',
     subcategory: 'Ladoo',
     images: [
-      '/images/placeholders/category-mithai.svg'
+      '/images/products/mithai/royal-shahi-besan-ladoo/main-800.webp',
+      '/images/products/mithai/royal-shahi-besan-ladoo/closeup-800.webp',
+      '/images/products/mithai/royal-shahi-besan-ladoo/serving-800.webp'
     ],
     variants: [
       { id: 'v-s9-250', weight: '250g Box', price: 195, mrp: 235, stock: 50, sku: 'DD-SWT-BSN-250' },
