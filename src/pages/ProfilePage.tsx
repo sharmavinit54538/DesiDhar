@@ -28,8 +28,8 @@ export const ProfilePage: React.FC = () => {
   const { openAuthModal, addToast } = useUiStore();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [name, setName] = useState(user?.name || 'Aakash Verma');
-  const [email, setEmail] = useState(user?.email || 'aakash.desi@example.com');
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
 
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -210,68 +210,91 @@ export const ProfilePage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {user.addresses.map((addr) => (
-              <div
-                key={addr.id}
-                className="p-4 rounded-2xl border border-stone-200 flex flex-col justify-between gap-3 hover:border-amber-300 transition-colors"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-[#4A2C17]">{addr.name}</span>
-                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-stone-100 text-stone-700">
-                      {addr.type}
-                    </span>
+          {user.addresses.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {user.addresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  className="p-4 rounded-2xl border border-stone-200 flex flex-col justify-between gap-3 hover:border-amber-300 transition-colors"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sm text-[#4A2C17]">{addr.name}</span>
+                      <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-stone-100 text-stone-700">
+                        {addr.type}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-600 leading-relaxed">
+                      {addr.addressLine1}, {addr.addressLine2 ? `${addr.addressLine2}, ` : ''}
+                      {addr.city}, {addr.state} - {addr.pincode}
+                    </p>
+                    <p className="text-xs text-stone-500 font-mono">+91 {addr.phone}</p>
                   </div>
-                  <p className="text-xs text-stone-600 leading-relaxed">
-                    {addr.addressLine1}, {addr.addressLine2 ? `${addr.addressLine2}, ` : ''}
-                    {addr.city}, {addr.state} - {addr.pincode}
-                  </p>
-                  <p className="text-xs text-stone-500 font-mono">+91 {addr.phone}</p>
-                </div>
 
-                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                  {addr.isDefault ? (
-                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      Default Delivery Address
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setDefaultAddress(addr.id)}
-                      className="text-stone-500 hover:text-amber-700 font-semibold text-[11px]"
-                    >
-                      Set as Default
-                    </button>
-                  )}
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingAddress(addr);
-                        setIsAddressModalOpen(true);
-                      }}
-                      className="p-1 text-stone-400 hover:text-stone-700"
-                      aria-label="Edit address"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    {user.addresses.length > 1 && (
+                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                    {addr.isDefault ? (
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Default Delivery Address
+                      </span>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => deleteAddress(addr.id)}
-                        className="p-1 text-stone-400 hover:text-red-600"
-                        aria-label="Delete address"
+                        onClick={() => setDefaultAddress(addr.id)}
+                        className="text-stone-500 hover:text-amber-700 font-semibold text-[11px]"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        Set as Default
                       </button>
                     )}
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingAddress(addr);
+                          setIsAddressModalOpen(true);
+                        }}
+                        className="p-1 text-stone-400 hover:text-stone-700"
+                        aria-label="Edit address"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      {user.addresses.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => deleteAddress(addr.id)}
+                          className="p-1 text-stone-400 hover:text-red-600"
+                          aria-label="Delete address"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 px-4 rounded-2xl border border-dashed border-stone-200 bg-stone-50/50">
+              <MapPin className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+              <p className="text-xs font-bold text-stone-700">No saved delivery addresses</p>
+              <p className="text-[11px] text-stone-400 mt-0.5 max-w-xs mx-auto">
+                Add an address to receive fresh farm milk, Bilona ghee, and chilled paneer.
+              </p>
+              <div className="mt-3">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Plus className="w-3.5 h-3.5" />}
+                  onClick={() => {
+                    setEditingAddress(null);
+                    setIsAddressModalOpen(true);
+                  }}
+                >
+                  Add Your First Address
+                </Button>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
