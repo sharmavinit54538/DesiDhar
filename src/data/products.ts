@@ -899,7 +899,9 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Set Dahi',
     images: [
-      '/images/placeholders/category-curd-dahi.svg'
+      '/images/products/curd-dahi/pure-cow-milk-thick-dahi/main-800.webp',
+      '/images/products/curd-dahi/pure-cow-milk-thick-dahi/closeup-800.webp',
+      '/images/products/curd-dahi/pure-cow-milk-thick-dahi/serving-800.webp'
     ],
     variants: [
       { id: 'v-d2-400', weight: '400g Tub', price: 48, mrp: 55, stock: 110, sku: 'DD-DAHI-COW-400' },
@@ -926,7 +928,9 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Mishti Doi',
     images: [
-      '/images/placeholders/category-curd-dahi.svg'
+      '/images/products/curd-dahi/authentic-kolkata-baked-mishti-doi/main-800.webp',
+      '/images/products/curd-dahi/authentic-kolkata-baked-mishti-doi/closeup-800.webp',
+      '/images/products/curd-dahi/authentic-kolkata-baked-mishti-doi/serving-800.webp'
     ],
     variants: [
       { id: 'v-d3-200', weight: '200g Clay Handi', price: 55, mrp: 65, stock: 70, sku: 'DD-DAHI-MSH-200' },
@@ -953,7 +957,9 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Flavored Dahi',
     images: [
-      '/images/placeholders/category-curd-dahi.svg'
+      '/images/products/curd-dahi/alphonso-mango-greek-dahi/main-800.webp',
+      '/images/products/curd-dahi/alphonso-mango-greek-dahi/closeup-800.webp',
+      '/images/products/curd-dahi/alphonso-mango-greek-dahi/serving-800.webp'
     ],
     variants: [
       { id: 'v-d4-200', weight: '200g Cup', price: 65, mrp: 79, stock: 55, sku: 'DD-DAHI-MNG-200' },
@@ -979,7 +985,9 @@ export const PRODUCTS: Product[] = [
     category: 'curd-dahi',
     subcategory: 'Chaas & Buttermilk',
     images: [
-      '/images/placeholders/category-curd-dahi.svg'
+      '/images/products/curd-dahi/desi-tadka-masala-chaas-buttermilk/main-800.webp',
+      '/images/products/curd-dahi/desi-tadka-masala-chaas-buttermilk/closeup-800.webp',
+      '/images/products/curd-dahi/desi-tadka-masala-chaas-buttermilk/serving-800.webp'
     ],
     variants: [
       { id: 'v-d5-300', weight: '300ml Bottle', price: 28, mrp: 35, stock: 120, sku: 'DD-DAHI-CHS-300' },
