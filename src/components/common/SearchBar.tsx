@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, X, Clock, ArrowRight, Sparkles, TrendingUp } from 'lucide-react';
 import { api } from '../../services/api';
-import type { Product, Category } from '../../types';
+import type { Category, Product } from '../../types';
 import { formatINR } from '../../utils/formatters';
 import { RatingBadge } from './RatingBadge';
+import { getProductThumbnail, handleImageError } from '../../utils/imageResolver';
 import { cn } from '../../utils/cn';
+import { useStorefront } from '../../context/StorefrontContext';
 
 const RECENT_SEARCHES_KEY = 'desidhar_recent_searches';
 
@@ -17,7 +19,7 @@ interface SearchBarProps {
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   className,
-  placeholder = 'Search "A2 Bilona Ghee", "Fresh Paneer", "Kaju Katli"...',
+  placeholder = 'Search for ghee, paneer, mithai…',
   onSearchSubmit,
 }) => {
   const [query, setQuery] = useState('');
@@ -25,55 +27,83 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     products: Product[];
     categories: Category[];
   }>({ products: [], categories: [] });
+  const [trending, setTrending] = useState<Product[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestionError, setSuggestionError] = useState('');
+  const { categories } = useStorefront();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  // Load recent searches
   useEffect(() => {
     try {
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
       if (stored) {
-        setRecentSearches(JSON.parse(stored));
-      } else {
-        setRecentSearches(['A2 Ghee', 'Fresh Paneer', 'Matka Dahi', 'Kaju Katli']);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setRecentSearches(parsed.filter((term) => typeof term === 'string').slice(0, 5));
+        }
       }
     } catch {
       setRecentSearches([]);
     }
   }, []);
 
-  // Debounced search
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    api
+      .getTrendingProducts(5)
+      .then((products) => {
+        if (active) setTrending(products);
+      })
+      .catch(() => {
+        if (active) setTrending([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     if (!query.trim()) {
       setSuggestions({ products: [], categories: [] });
       setIsLoading(false);
+      setSuggestionError('');
       return;
     }
 
+    let active = true;
     setIsLoading(true);
+    setSuggestionError('');
     const timer = setTimeout(async () => {
       try {
         const res = await api.searchSuggestions(query);
-        setSuggestions(res);
-      } catch (e) {
-        console.error('Search suggestion error', e);
+        if (active) setSuggestions(res);
+      } catch (error) {
+        if (active) {
+          setSuggestions({ products: [], categories: [] });
+          setSuggestionError(
+            error instanceof Error ? error.message : 'Search suggestions are unavailable.'
+          );
+        }
       } finally {
-        setIsLoading(false);
+        if (active) setIsLoading(false);
       }
     }, 180);
 
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [query]);
 
-  // Click outside listener
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -84,12 +114,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const saveRecentSearch = (term: string) => {
     const trimmed = term.trim();
     if (!trimmed) return;
-    const updated = [trimmed, ...recentSearches.filter((s) => s.toLowerCase() !== trimmed.toLowerCase())].slice(0, 5);
+    const updated = [
+      trimmed,
+      ...recentSearches.filter((entry) => entry.toLowerCase() !== trimmed.toLowerCase()),
+    ].slice(0, 5);
     setRecentSearches(updated);
     try {
       localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // Storage is a convenience only; ignore quota/privacy-mode failures.
     }
   };
 
@@ -101,10 +134,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     if (onSearchSubmit) onSearchSubmit();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
       handleSearchSubmit(query);
-    } else if (e.key === 'Escape') {
+    } else if (event.key === 'Escape') {
       setIsOpen(false);
     }
   };
@@ -112,19 +145,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const clearQuery = () => {
     setQuery('');
     setSuggestions({ products: [], categories: [] });
+    setSuggestionError('');
     inputRef.current?.focus();
   };
 
   return (
     <div ref={containerRef} className={cn('relative w-full', className)}>
-      {/* Search Input Bar */}
       <div className="relative flex items-center w-full">
         <input
           ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
+          onChange={(event) => {
+            setQuery(event.target.value);
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
@@ -134,10 +167,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           className="w-full h-11 pl-11 pr-24 rounded-xl bg-white border border-stone-200 text-[#4A2C17] placeholder:text-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-xs transition-all duration-150"
         />
 
-        {/* Search Icon */}
         <Search className="absolute left-3.5 w-4 h-4 text-stone-400 pointer-events-none" />
 
-        {/* Action icons right: clear or submit button */}
         <div className="absolute right-2 flex items-center gap-1">
           {query && (
             <button
@@ -161,10 +192,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       </div>
 
-      {/* Dropdown Suggestions Panel */}
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-2xl border border-stone-200/90 overflow-hidden z-50 animate-in fade-in-50 duration-150">
-          {/* Query is empty: Show Recent Searches & Popular Tags */}
           {!query.trim() ? (
             <div className="p-4">
               {recentSearches.length > 0 && (
@@ -185,9 +214,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {recentSearches.map((term, i) => (
+                    {recentSearches.map((term) => (
                       <button
-                        key={i}
+                        key={term}
                         type="button"
                         onClick={() => {
                           setQuery(term);
@@ -202,38 +231,70 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 </div>
               )}
 
-              {/* Popular categories quick jump */}
               <div>
                 <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Popular Dairy Categories
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Shop by Category
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {[
-                    { label: 'A2 Desi Ghee', slug: 'ghee' },
-                    { label: 'Fresh Paneer', slug: 'paneer' },
-                    { label: 'White Makkhan', slug: 'butter' },
-                    { label: 'Kaju Katli', slug: 'mithai' },
-                  ].map((cat, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => {
-                        setIsOpen(false);
-                        navigate(`/category/${cat.slug}`);
-                      }}
-                      className="p-2 rounded-xl border border-stone-100 bg-[#FFFDF9] hover:bg-amber-50 text-left text-xs font-medium text-[#4A2C17] hover:border-amber-200 transition-colors flex items-center justify-between"
-                    >
-                      <span>{cat.label}</span>
-                      <ArrowRight className="w-3 h-3 text-stone-400" />
-                    </button>
-                  ))}
-                </div>
+                {categories.length === 0 ? (
+                  <p className="text-xs text-stone-400 py-1">Categories are loading…</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {categories.slice(0, 8).map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => {
+                          setIsOpen(false);
+                          navigate(`/category/${cat.slug}`);
+                        }}
+                        className="p-2 rounded-xl border border-stone-100 bg-[#FFFDF9] hover:bg-amber-50 text-left text-xs font-medium text-[#4A2C17] hover:border-amber-200 transition-colors flex items-center justify-between"
+                      >
+                        <span className="truncate">{cat.name}</span>
+                        <ArrowRight className="w-3 h-3 text-stone-400 shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+
+              {trending.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-stone-100">
+                  <div className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> Most ordered
+                  </div>
+                  <div className="divide-y divide-stone-100">
+                    {trending.map((product) => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        onClick={() => {
+                          setIsOpen(false);
+                          navigate(`/product/${product.slug}`);
+                        }}
+                        className="w-full flex items-center gap-3 py-2 text-left hover:bg-amber-50/50 rounded-lg px-1"
+                      >
+                        <img
+                          src={getProductThumbnail(product)}
+                          alt={product.name}
+                          onError={(event) => handleImageError(event, product.category)}
+                          className="w-9 h-9 rounded-lg object-cover border border-stone-200 shrink-0"
+                        />
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-xs font-semibold text-[#4A2C17] truncate">
+                            {product.name}
+                          </span>
+                          <span className="block text-[11px] text-stone-500">
+                            From {formatINR(product.variants[0]?.price ?? 0)}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
-            /* Query has text: Live suggestions */
             <div>
-              {/* Category suggestions */}
               {suggestions.categories.length > 0 && (
                 <div className="px-4 py-2.5 bg-amber-50/50 border-b border-stone-100 flex flex-wrap items-center gap-2">
                   <span className="text-xs text-stone-500 font-medium">In Categories:</span>
@@ -253,7 +314,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 </div>
               )}
 
-              {/* Product suggestions */}
               {suggestions.products.length > 0 ? (
                 <div className="py-2 divide-y divide-stone-100 max-h-80 overflow-y-auto">
                   {suggestions.products.map((prod) => (
@@ -267,25 +327,26 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                       className="px-4 py-2.5 hover:bg-amber-50/60 cursor-pointer flex items-center gap-3 transition-colors"
                     >
                       <img
-                        src={typeof prod.images[0] === 'string' ? prod.images[0] : prod.images[0]?.src}
+                        src={getProductThumbnail(prod)}
                         alt={prod.name}
+                        onError={(event) => handleImageError(event, prod.category)}
                         className="w-12 h-12 object-cover rounded-lg border border-stone-200 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-stone-500 uppercase">
-                          {prod.brand}
-                        </div>
+                        <div className="text-xs font-medium text-stone-500 uppercase">{prod.brand}</div>
                         <div className="text-sm font-semibold text-[#4A2C17] truncate">
                           {prod.name}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-xs font-bold text-[#4A2C17]">
-                            {formatINR(prod.variants[0].price)}
+                            {formatINR(prod.variants[0]?.price ?? 0)}
                           </span>
-                          <span className="text-[11px] text-stone-400 line-through">
-                            {formatINR(prod.variants[0].mrp)}
-                          </span>
-                          <RatingBadge rating={prod.rating} size="sm" />
+                          {prod.variants[0] && prod.variants[0].mrp > prod.variants[0].price && (
+                            <span className="text-[11px] text-stone-400 line-through">
+                              {formatINR(prod.variants[0].mrp)}
+                            </span>
+                          )}
+                          {prod.rating !== null && <RatingBadge rating={prod.rating} size="sm" />}
                         </div>
                       </div>
                       <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
@@ -301,35 +362,33 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              ) : !isLoading ? (
-                /* No matching products */
+              ) : isLoading ? (
+                <div className="p-6 text-center text-xs text-stone-400">Searching products…</div>
+              ) : suggestionError ? (
+                <div className="p-4 text-center text-xs text-red-600">{suggestionError}</div>
+              ) : (
                 <div className="p-6 text-center">
                   <p className="text-sm font-medium text-stone-600 mb-2">
-                    No dairy or sweets found matching &ldquo;{query}&rdquo;
+                    No products found matching &ldquo;{query}&rdquo;
                   </p>
                   <p className="text-xs text-stone-400 mb-4">
-                    Check spelling or try popular categories like Ghee, Paneer, Milk, Mithai.
+                    Check the spelling or browse our categories.
                   </p>
-                  <div className="flex justify-center gap-2">
-                    {['Bilona Ghee', 'Malai Paneer', 'Matka Dahi'].map((sample, i) => (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {categories.slice(0, 3).map((cat) => (
                       <button
-                        key={i}
+                        key={cat.id}
                         type="button"
                         onClick={() => {
-                          setQuery(sample);
-                          handleSearchSubmit(sample);
+                          setIsOpen(false);
+                          navigate(`/category/${cat.slug}`);
                         }}
                         className="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-amber-100 text-stone-700 text-xs font-medium"
                       >
-                        {sample}
+                        {cat.name}
                       </button>
                     ))}
                   </div>
-                </div>
-              ) : (
-                /* Loading state */
-                <div className="p-6 text-center text-xs text-stone-400">
-                  Searching dairy farms...
                 </div>
               )}
             </div>

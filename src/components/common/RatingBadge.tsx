@@ -3,7 +3,8 @@ import { Star } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 interface RatingBadgeProps {
-  rating: number;
+  /** `null` means the product has no published reviews yet — never invent a score. */
+  rating: number | null;
   reviewCount?: number;
   size?: 'sm' | 'md' | 'lg';
   showCount?: boolean;
@@ -17,6 +18,27 @@ export const RatingBadge: React.FC<RatingBadgeProps> = ({
   showCount = false,
   className,
 }) => {
+  if (rating === null || Number.isNaN(rating)) {
+    return (
+      <div className={cn('inline-flex items-center gap-1.5', className)}>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 font-semibold rounded border border-stone-200 bg-stone-50 text-stone-500',
+            size === 'lg'
+              ? 'text-sm px-2.5 py-1'
+              : size === 'md'
+              ? 'text-xs px-2 py-0.5'
+              : 'text-[11px] px-1.5 py-0.5'
+          )}
+          title="No published customer reviews yet"
+        >
+          <Star className="w-3 h-3" />
+          <span>New</span>
+        </span>
+      </div>
+    );
+  }
+
   const isHigh = rating >= 4.0;
   const isMedium = rating >= 3.0 && rating < 4.0;
 

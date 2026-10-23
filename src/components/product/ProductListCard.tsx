@@ -21,12 +21,13 @@ interface ProductListCardProps {
 export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const activeVariant = product.variants[selectedVariantIndex] || product.variants[0];
-
-  const primaryImage = getPrimaryProductImage(product, activeVariant.id);
+  const primaryImage = getPrimaryProductImage(product);
 
   const { items, addItem, updateQuantity } = useCartStore();
-  const { isInWishlist, toggleWishlist } = useWishlistStore();
+  const { isInWishlist, toggle: toggleWishlist, status: wishlistStatus } = useWishlistStore();
   const { addToast } = useUiStore();
+
+  if (!activeVariant) return null;
 
   const isWishlisted = isInWishlist(product.id);
   const cartItem = items.find((i) => i.variantId === activeVariant.id);
@@ -78,8 +79,10 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
         </div>
         <button
           type="button"
-          onClick={() => toggleWishlist(product)}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 shadow-xs flex items-center justify-center text-stone-400 hover:text-red-500"
+          onClick={() => void toggleWishlist(product)}
+          disabled={wishlistStatus === 'loading'}
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 shadow-xs flex items-center justify-center text-stone-400 hover:text-red-500 disabled:opacity-60"
         >
           <Heart className={cn('w-4 h-4', isWishlisted ? 'fill-red-500 text-red-500' : '')} />
         </button>
@@ -135,9 +138,7 @@ export const ProductListCard: React.FC<ProductListCardProps> = ({ product }) => 
               {product.storage && <span>•</span>}
             </>
           )}
-          {product.storage && (
-            <span>{typeof product.storage === 'string' ? product.storage : product.storage.storageInstructions}</span>
-          )}
+          {product.storage && <span>{product.storage}</span>}
         </div>
       </div>
 

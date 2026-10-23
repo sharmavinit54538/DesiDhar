@@ -61,7 +61,7 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
 
         {/* Delivery Fee */}
         <div className="flex justify-between items-center text-stone-600">
-          <span>Cold-Chain Delivery Fee</span>
+          <span>Delivery Fee</span>
           {pricing.deliveryFee === 0 ? (
             <span className="text-emerald-800 font-bold uppercase text-[11px]">
               FREE
@@ -109,7 +109,7 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       {/* Trust Guarantee */}
       <div className="pt-2 border-t border-stone-100 flex items-center justify-center gap-1.5 text-[11px] text-stone-500 font-medium text-center">
         <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-        <span>Safe &amp; Secure Payments • 100% Pure Dairy</span>
+        <span>Prices are inclusive of applicable taxes</span>
       </div>
     </div>
   );

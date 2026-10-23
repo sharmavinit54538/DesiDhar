@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Product, ProductVariant } from '../../types';
+import { useStorefront } from '../../context/StorefrontContext';
 import { ShieldCheck } from 'lucide-react';
 
 interface ProductSpecificationsTableProps {
@@ -7,36 +8,34 @@ interface ProductSpecificationsTableProps {
   activeVariant: ProductVariant;
 }
 
+/**
+ * Only shows attributes that exist in the catalogue record. Rows are dropped when
+ * the value is missing instead of filling them with invented defaults.
+ */
 export const ProductSpecificationsTable: React.FC<ProductSpecificationsTableProps> = ({
   product,
   activeVariant,
 }) => {
-  const shelfLifeVal =
-    product.shelfLife ||
-    (typeof product.storage === 'object' ? product.storage?.shelfLifeText : undefined) ||
-    '30 Days from Packing';
+  const { settings } = useStorefront();
 
-  const storageVal =
-    typeof product.storage === 'string'
-      ? product.storage
-      : product.storage?.storageInstructions || 'Cool, dry, hygienic place away from sunlight';
-
-  const specs = [
+  const specs: { label: string; value: string }[] = [
     { label: 'Brand', value: product.brand },
-    { label: 'Hindi Name', value: product.hindiName || '—' },
-    { label: 'Category', value: `${product.category} › ${product.subcategory}` },
-    { label: 'Sweet / Item Type', value: product.sweetType || product.subcategory },
-    { label: 'Region of Origin', value: product.originRegion || 'North India / Braj Heritage' },
-    { label: 'Vegetarian Symbol', value: '100% Shuddh Vegetarian (Green Dot Marked)' },
+    { label: 'Hindi Name', value: product.hindiName },
+    { label: 'Category', value: product.subcategory ? `${product.category} › ${product.subcategory}` : product.category },
+    { label: 'Item Type', value: product.sweetType },
+    { label: 'Region of Origin', value: product.originRegion },
     { label: 'Net Content', value: activeVariant.weight },
-    { label: 'Selected SKU', value: activeVariant.sku },
-    { label: 'FSSAI License No.', value: `Lic. #${product.fssaiNumber || '10020011002341'}` },
-    { label: 'Shelf Life', value: shelfLifeVal },
-    { label: 'Storage Instructions', value: storageVal },
-    { label: 'HSN Code (GST)', value: 'HSN 2106 / 0405 (5% GST Inclusive - Sample)' },
-    { label: 'Country of Origin', value: 'India (Bharat)' },
-    { label: 'Manufacturer / Packer', value: 'DesiDhar Dairy Hub, Mathura Road, NCR 110001' },
-  ];
+    { label: 'SKU', value: activeVariant.sku },
+    { label: 'Shelf Life', value: product.shelfLife },
+    { label: 'Storage Instructions', value: product.storage },
+    {
+      label: 'FSSAI Licence',
+      value: settings?.fssaiLicenseNumber ? settings.fssaiLicenseNumber : undefined,
+    },
+    { label: 'Country of Origin', value: 'India' },
+  ].filter((spec): spec is { label: string; value: string } =>
+    Boolean(spec.value && String(spec.value).trim() !== '')
+  );
 
   return (
     <div className="border border-stone-200 rounded-2xl overflow-hidden bg-white shadow-2xs">
@@ -44,17 +43,19 @@ export const ProductSpecificationsTable: React.FC<ProductSpecificationsTableProp
         <h4 className="font-extrabold text-sm text-[#4A2C17] uppercase tracking-wider font-heading">
           Product Specifications / उत्पाद विवरण
         </h4>
-        <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
-          <ShieldCheck className="w-3.5 h-3.5" /> FSSAI Verified
-        </span>
+        {settings?.fssaiLicenseNumber && (
+          <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-bold">
+            <ShieldCheck className="w-3.5 h-3.5" /> Licence on record
+          </span>
+        )}
       </div>
 
       <div className="divide-y divide-stone-100 text-xs">
-        {specs.map((item, idx) => (
+        {specs.map((item, index) => (
           <div
             key={item.label}
             className={`grid grid-cols-1 sm:grid-cols-3 px-4 py-2.5 ${
-              idx % 2 === 0 ? 'bg-white' : 'bg-[#FFFDF9]'
+              index % 2 === 0 ? 'bg-white' : 'bg-[#FFFDF9]'
             }`}
           >
             <span className="font-semibold text-stone-500">{item.label}</span>

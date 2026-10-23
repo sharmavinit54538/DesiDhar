@@ -32,6 +32,12 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({
           <img
             src={item.image}
             alt={item.name}
+            onError={(event) => {
+              const target = event.currentTarget;
+              if (target.dataset.hasError === 'true') return;
+              target.dataset.hasError = 'true';
+              target.src = '/images/placeholders/product-placeholder.svg';
+            }}
             className="w-full h-full object-cover hover:scale-105 transition-transform"
           />
         </Link>

@@ -20,7 +20,8 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   const isCancelled = order.status === 'CANCELLED';
   const isPlaced = order.status === 'PLACED';
 
-  const statusPills = {
+  const statusPills: Record<string, string> = {
+    PENDING_PAYMENT: 'bg-amber-100 text-amber-900 border-amber-300',
     PLACED: 'bg-amber-100 text-amber-900 border-amber-300',
     PACKED: 'bg-sky-100 text-sky-900 border-sky-300',
     OUT_FOR_DELIVERY: 'bg-indigo-100 text-indigo-900 border-indigo-300',
@@ -28,12 +29,13 @@ export const OrderCard: React.FC<OrderCardProps> = ({
     CANCELLED: 'bg-red-100 text-red-900 border-red-300',
   };
 
-  const statusLabels = {
-    PLACED: 'Order Confirmed',
-    PACKED: 'Cold-Packed at Farm',
-    OUT_FOR_DELIVERY: 'Out for Morning Drop',
-    DELIVERED: 'Delivered at Doorstep',
-    CANCELLED: 'Order Cancelled',
+  const statusLabels: Record<string, string> = {
+    PENDING_PAYMENT: 'Payment pending',
+    PLACED: 'Order placed',
+    PACKED: 'Packed',
+    OUT_FOR_DELIVERY: 'Out for delivery',
+    DELIVERED: 'Delivered',
+    CANCELLED: 'Cancelled',
   };
 
   return (
@@ -47,10 +49,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             </span>
             <span
               className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border ${
-                statusPills[order.status]
+                statusPills[order.status] || 'bg-stone-100 text-stone-700 border-stone-300'
               }`}
             >
-              {statusLabels[order.status]}
+              {statusLabels[order.status] || order.status}
             </span>
           </div>
           <div className="text-xs text-stone-400 mt-0.5">
@@ -63,7 +65,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             {formatINR(order.pricing.total)}
           </div>
           <div className="text-[11px] text-stone-500">
-            {order.items.reduce((s, i) => s + i.quantity, 0)} items ({order.paymentMethod})
+            {order.items.reduce((sum, item) => sum + item.quantity, 0)} items · {order.paymentMethod} ({order.paymentStatus})
           </div>
         </div>
       </div>
@@ -78,6 +80,12 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             <img
               src={item.image}
               alt={item.name}
+              onError={(event) => {
+                const target = event.currentTarget;
+                if (target.dataset.hasError === 'true') return;
+                target.dataset.hasError = 'true';
+                target.src = '/images/placeholders/product-placeholder.svg';
+              }}
               className="w-12 h-12 object-cover rounded-lg border border-stone-200 shrink-0"
             />
             <div className="min-w-0 pr-2">

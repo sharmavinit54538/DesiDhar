@@ -7,8 +7,6 @@ export interface ProductVariant {
   mrp: number;
   stock: number;
   sku: string;
-  piecesPerPack?: number;
-  weightInGrams?: number;
   isDefault?: boolean;
 }
 
@@ -18,139 +16,23 @@ export interface ProductImage {
   srcset?: string;
   sizes?: string;
   alt: string;
-  type: 'main' | 'closeup' | 'packaging' | 'serving' | 'size-reference' | 'placeholder';
+  type: string;
   isMain: boolean;
   order: number;
   width: number;
   height: number;
-  attribution?: ImageAttribution;
-}
-
-export interface ImageAttribution {
-  source: 'unsplash' | 'pexels' | 'pixabay' | 'local';
-  photographer: string;
-  photographerUrl?: string;
-  license: string;
-  originalUrl: string;
-  downloadedAt: string;
-}
-
-export interface NutritionalInfo {
-  energyKcal: number;
-  protein: number;
-  carbohydrates: number;
-  sugars: number;
-  fat: number;
-  saturatedFat: number;
-  transFat: number;
-  sodium: number;
-  fiber?: number;
-  cholesterol?: number;
-  servingSize: string;
-  servingSizeGrams: number;
-  isSampleData: boolean;
-}
-
-export interface Ingredient {
-  name: string;
-  percentage?: number;
-  isAllergen: boolean;
-  allergenType?: 'milk' | 'nuts' | 'gluten' | 'egg' | 'soy' | 'sulphites' | 'mustard' | 'sesame' | 'celery' | 'lupin' | 'molluscs' | 'crustaceans' | 'fish';
-}
-
-export interface AllergenInfo {
-  contains: string[];
-  mayContain: string[];
-  freeFrom: string[];
-}
-
-export interface DietaryTags {
-  isVeg: boolean;
-  isEggless: boolean;
-  isSugarFree: boolean;
-  isLowSugar: boolean;
-  isJainFriendly: boolean;
-  isFastingFriendly: boolean;
-  isOrganic: boolean;
-  isA2: boolean;
-  isHandmade: boolean;
-  isNoAddedSugar: boolean;
-  badges: string[];
-}
-
-export interface RegulatoryInfo {
-  fssaiLicenseNumber: string;
-  fssaiLicenseNumberIsSample: boolean;
-  manufacturerName: string;
-  manufacturerAddress: string;
-  packedBy?: string;
-  marketedBy?: string;
-  countryOfOrigin: string;
-  batchNumber: string;
-  manufacturingDate: string;
-  expiryDate: string;
-  netWeight: string;
-  grossWeight: string;
-  packagingType: 'box' | 'tin' | 'pouch' | 'jar' | 'bottle' | 'handi' | 'can' | 'carton';
-  vegSymbol: boolean;
-  mrpInclusiveOfTaxes: boolean;
-  hsnCode: string;
-  gstRate: number;
-  gstRateIsSample: boolean;
-}
-
-export interface StorageInfo {
-  shelfLifeDays: number;
-  shelfLifeText: string;
-  bestBeforeDaysFromManufacture: number;
-  storageInstructions: string;
-  servingSuggestion: string;
-  temperatureMin?: number;
-  temperatureMax?: number;
-  requiresRefrigeration: boolean;
-  coldChainRequired: boolean;
-}
-
-export interface FAQ {
-  question: string;
-  answer: string;
-  category?: string;
-}
-
-export interface Review {
-  id: string;
-  productId: string;
-  userName: string;
-  userLocation: string;
-  rating: number;
-  date: string;
-  comment: string;
-  verifiedPurchase: boolean;
-  helpfulCount: number;
-  reviewImages?: string[];
-}
-
-export interface SEOData {
-  metaTitle: string;
-  metaDescription: string;
-  keywords: string[];
-  slug: string;
-  ogImage: string;
-  ogTitle?: string;
-  ogDescription?: string;
-}
-
-export interface DeliveryInfo {
-  isPerishable: boolean;
-  coldChainRequired: boolean;
-  estimatedDeliveryDays: string;
-  returnPolicy: string;
-  nonReturnableOnceOpened: boolean;
+  isVerifiedSpecific: boolean;
+  assetStatus: 'verified_authentic' | 'pending_studio_shot';
 }
 
 export interface ProductHighlight {
   text: string;
   icon?: string;
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
 }
 
 export interface Product {
@@ -163,32 +45,25 @@ export interface Product {
   subcategory?: string;
   sweetType?: string;
   originRegion?: string;
-  images: (string | ProductImage)[];
+  images: ProductImage[];
   variants: ProductVariant[];
-  rating: number;
+  rating: number | null;
   reviewCount: number;
   tags: string[];
-  highlights?: (string | ProductHighlight)[];
+  highlights?: ProductHighlight[];
   shortDescription: string;
   description: string;
-  ingredients?: string | Ingredient[];
-  allergens?: AllergenInfo;
-  nutrition?: Record<string, string> | NutritionalInfo;
-  dietaryTags?: DietaryTags;
-  regulatory?: RegulatoryInfo;
+  ingredients?: string;
+  nutrition?: Record<string, string> | null;
   shelfLife?: string;
-  storage?: string | StorageInfo;
-  faqs?: (FAQ | { question: string; answer: string })[];
-  delivery?: DeliveryInfo;
-  reviews?: Review[];
-  seo?: SEOData;
+  storage?: string;
+  faqs?: FAQ[];
   isVeg: boolean;
-  isBestseller?: boolean;
-  isFresh?: boolean;
-  isDeal?: boolean;
+  isFeatured: boolean;
+  isFresh: boolean;
+  isDeal: boolean;
   dealEndsAt?: string;
-  fssaiNumber?: string;
-  isSampleData?: boolean;
+  stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock';
   createdAt?: string;
   updatedAt?: string;
 }
@@ -238,11 +113,20 @@ export interface DeliverySlot {
   title: string;
   timeWindow: string;
   date: string;
+  isoDate?: string;
   tag?: string;
   isAvailable: boolean;
+  isDefault?: boolean;
 }
 
 export type PaymentMethod = 'UPI' | 'CARD' | 'NETBANKING' | 'COD';
+
+export interface PaymentMethodOption {
+  id: PaymentMethod;
+  enabled: boolean;
+  label: string;
+  provider?: string | null;
+}
 
 export interface OrderPricing {
   mrpTotal: number;
@@ -254,8 +138,18 @@ export interface OrderPricing {
   couponCode?: string;
 }
 
+export type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PLACED'
+  | 'PACKED'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
+export type OrderPaymentStatus = 'PAID' | 'PENDING' | 'COD' | 'REFUND_PENDING';
+
 export interface OrderTimelineItem {
-  status: 'PLACED' | 'PACKED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
+  status: OrderStatus | string;
   title: string;
   time: string;
   done: boolean;
@@ -266,15 +160,26 @@ export interface Order {
   id: string;
   orderNumber: string;
   createdAt: string;
+  updatedAt?: string;
   items: CartItem[];
   address: Address;
   deliverySlot: DeliverySlot;
   paymentMethod: PaymentMethod;
-  paymentStatus: 'PAID' | 'PENDING' | 'COD';
-  status: 'PLACED' | 'PACKED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus: OrderPaymentStatus;
+  paymentReference?: string;
+  paymentProvider?: string;
+  status: OrderStatus;
   timeline: OrderTimelineItem[];
   pricing: OrderPricing;
-  trackingNumber: string;
+  trackingNumber: string | null;
+  courierName?: string | null;
+  payment?: {
+    method: PaymentMethod;
+    status: string;
+    onlinePaymentRequired: boolean;
+    provider: string | null;
+    keyId: string | null;
+  };
 }
 
 export interface User {
@@ -282,7 +187,7 @@ export interface User {
   name: string;
   phone: string;
   email?: string;
-  addresses: Address[];
+  role: 'customer' | 'admin';
   isLoggedIn: boolean;
 }
 
@@ -293,7 +198,7 @@ export interface Coupon {
   minOrderValue: number;
   maxDiscount?: number;
   description: string;
-  validUntil: string;
+  validUntil?: string;
 }
 
 export interface PincodeCheckResult {
@@ -303,6 +208,23 @@ export interface PincodeCheckResult {
   coldChainAvailable: boolean;
   city: string;
   message: string;
+}
+
+export interface PublicSettings {
+  currency: string;
+  freeDeliveryThreshold: number;
+  deliveryFee: number;
+  codEnabled: boolean;
+  onlinePaymentsEnabled: boolean;
+  paymentProvider: string | null;
+  fssaiLicenseNumber: string | null;
+  supportEmail: string | null;
+  supportPhone: string | null;
+  supportWhatsapp: string | null;
+  supportHours: string | null;
+  companyName: string | null;
+  companyAddress: string | null;
+  companyGstin: string | null;
 }
 
 export type SortOption =
@@ -326,6 +248,15 @@ export interface FilterState {
   searchQuery?: string;
 }
 
+export interface ProductFacets {
+  brands: string[];
+  weights: string[];
+  dietaryTags: string[];
+  priceMin: number;
+  priceMax: number;
+  categories: { slug: string; name: string; count: number }[];
+}
+
 export interface HeroBanner {
   id: string;
   title: string;
@@ -337,4 +268,60 @@ export interface HeroBanner {
   bgGradient: string;
   image: string;
   highlightText: string;
+}
+
+export interface Review {
+  id: string;
+  productId: string;
+  userName: string;
+  userLocation: string;
+  rating: number;
+  date: string;
+  comment: string;
+  verifiedPurchase: boolean;
+  helpfulCount: number;
+  status?: 'published' | 'pending' | 'hidden';
+  productName?: string;
+  productSlug?: string;
+}
+
+export interface ReviewSummary {
+  average: number | null;
+  count: number;
+  breakdown: Record<string, number>;
+}
+
+export interface CartValidationIssue {
+  variantId?: string;
+  code:
+    | 'UNAVAILABLE'
+    | 'OUT_OF_STOCK'
+    | 'INSUFFICIENT_STOCK'
+    | 'COUPON_INVALID'
+    | 'INVALID_QUANTITY'
+    | string;
+  message: string;
+  availableStock?: number;
+}
+
+export interface CartValidationResult {
+  items: CartItem[];
+  pricing: OrderPricing;
+  issues: CartValidationIssue[];
+  coupon: Coupon | null;
+  freeDeliveryThreshold: number;
+}
+
+export interface ServerProductList {
+  products: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+  facets: ProductFacets;
+}
+
+export interface ApiErrorPayload {
+  code: string;
+  message: string;
+  details?: { field: string; message: string }[];
 }

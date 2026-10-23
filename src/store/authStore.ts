@@ -1,115 +1,136 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, Address } from '../types';
+import type { Address, User } from '../types';
+import { api, type AddressInput } from '../services/api';
+
+/**
+ * Session state is owned by the server (HttpOnly session cookie). This store only
+ * mirrors the profile that the API confirms via /auth/me — it is never a source of
+ * truth for authentication.
+ */
+
+type AuthStatus = 'idle' | 'loading' | 'ready';
 
 interface AuthState {
   user: User | null;
+  addresses: Address[];
+  status: AuthStatus;
+  sessionChecked: boolean;
   selectedPincode: string;
   selectedCity: string;
+  error: string | null;
 
-  // Actions
-  login: (user: User) => void;
-  logout: () => void;
-  updateProfile: (profile: Partial<User>) => void;
+  bootstrap: () => Promise<void>;
+  setSessionUser: (user: User) => Promise<void>;
+  logout: () => Promise<void>;
+  updateProfile: (payload: { name?: string; email?: string }) => Promise<void>;
+  refreshAddresses: () => Promise<void>;
+  addAddress: (address: AddressInput) => Promise<Address[]>;
+  updateAddress: (id: string, address: AddressInput) => Promise<void>;
+  deleteAddress: (id: string) => Promise<void>;
+  setDefaultAddress: (id: string) => Promise<void>;
   setPincode: (pincode: string, city?: string) => void;
-  addAddress: (address: Omit<Address, 'id'>) => Address;
-  updateAddress: (id: string, address: Partial<Address>) => void;
-  deleteAddress: (id: string) => void;
-  setDefaultAddress: (id: string) => void;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      selectedPincode: '110001',
-      selectedCity: 'New Delhi',
+      addresses: [],
+      status: 'idle',
+      sessionChecked: false,
+      selectedPincode: '',
+      selectedCity: '',
+      error: null,
 
-      login: (user: User) => {
+      bootstrap: async () => {
+        if (get().status === 'loading') return;
+        set({ status: 'loading', error: null });
+        try {
+          const { user, addresses } = await api.getSession();
+          set({
+            user,
+            addresses,
+            status: 'ready',
+            sessionChecked: true,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            user: null,
+            addresses: [],
+            status: 'ready',
+            sessionChecked: true,
+            error: error instanceof Error ? error.message : 'Unable to restore your session.',
+          });
+        }
+      },
+
+      setSessionUser: async (user) => {
+        set({ user, status: 'ready', sessionChecked: true, error: null });
+        try {
+          const addresses = await api.getAddresses();
+          set({ addresses });
+        } catch {
+          set({ addresses: [] });
+        }
+      },
+
+      logout: async () => {
+        try {
+          await api.logout();
+        } finally {
+          set({ user: null, addresses: [], error: null });
+        }
+      },
+
+      updateProfile: async (payload) => {
+        const user = await api.updateProfile(payload);
         set({ user });
       },
 
-      logout: () => {
-        set({ user: null });
+      refreshAddresses: async () => {
+        if (!get().user) return;
+        const addresses = await api.getAddresses();
+        set({ addresses });
       },
 
-      updateProfile: (profile: Partial<User>) => {
-        set((state) => ({
-          user: state.user ? { ...state.user, ...profile } : null,
-        }));
+      addAddress: async (address) => {
+        const addresses = await api.addAddress(address);
+        set({ addresses });
+        return addresses;
       },
 
-      setPincode: (pincode: string, city = 'New Delhi') => {
+      updateAddress: async (id, address) => {
+        const addresses = await api.updateAddress(id, address);
+        set({ addresses });
+      },
+
+      deleteAddress: async (id) => {
+        const addresses = await api.deleteAddress(id);
+        set({ addresses });
+      },
+
+      setDefaultAddress: async (id) => {
+        const addresses = await api.setDefaultAddress(id);
+        set({ addresses });
+      },
+
+      setPincode: (pincode, city = '') => {
         set({ selectedPincode: pincode, selectedCity: city });
       },
 
-      addAddress: (newAddrData: Omit<Address, 'id'>) => {
-        const id = `addr-${Date.now()}`;
-        const newAddress: Address = {
-          ...newAddrData,
-          id,
-        };
-
-        const { user } = get();
-        if (user) {
-          let updatedAddresses = [...user.addresses];
-          if (newAddress.isDefault) {
-            updatedAddresses = updatedAddresses.map((a) => ({
-              ...a,
-              isDefault: false,
-            }));
-          }
-          updatedAddresses.push(newAddress);
-          set({ user: { ...user, addresses: updatedAddresses } });
-        }
-
-        return newAddress;
-      },
-
-      updateAddress: (id: string, updatedFields: Partial<Address>) => {
-        const { user } = get();
-        if (!user) return;
-
-        let addresses = user.addresses.map((addr) => {
-          if (addr.id === id) {
-            return { ...addr, ...updatedFields };
-          }
-          if (updatedFields.isDefault) {
-            return { ...addr, isDefault: false };
-          }
-          return addr;
-        });
-
-        set({ user: { ...user, addresses } });
-      },
-
-      deleteAddress: (id: string) => {
-        const { user } = get();
-        if (!user) return;
-
-        const remaining = user.addresses.filter((a) => a.id !== id);
-        // If default was deleted, set first as default
-        if (remaining.length > 0 && !remaining.some((a) => a.isDefault)) {
-          remaining[0].isDefault = true;
-        }
-
-        set({ user: { ...user, addresses: remaining } });
-      },
-
-      setDefaultAddress: (id: string) => {
-        const { user } = get();
-        if (!user) return;
-
-        const updated = user.addresses.map((a) => ({
-          ...a,
-          isDefault: a.id === id,
-        }));
-
-        set({ user: { ...user, addresses: updated } });
-      },
+      clearError: () => set({ error: null }),
     }),
     {
       name: 'desidhar_auth_storage',
+      // Only the delivery PIN preference is cached locally. The user profile and
+      // addresses always come back from the server.
+      partialize: (state) => ({
+        selectedPincode: state.selectedPincode,
+        selectedCity: state.selectedCity,
+      }),
     }
   )
 );

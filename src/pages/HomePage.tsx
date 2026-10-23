@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { api } from '../services/api';
 import type { Product } from '../types';
@@ -10,47 +10,58 @@ import { CategoryGrid } from '../components/home/CategoryGrid';
 import { WhyDesiDhar } from '../components/home/WhyDesiDhar';
 import { CustomerReviews } from '../components/home/CustomerReviews';
 import { ProductCardSkeleton } from '../components/common/Skeleton';
+import { ErrorState } from '../components/common/ErrorState';
 import { Flame, Sparkles, Sun, PackageCheck, Gift } from 'lucide-react';
 
+interface HomeData {
+  deals: Product[];
+  dealEndsAt: string | null;
+  featured: Product[];
+  fresh: Product[];
+  sweets: Product[];
+  combos: Product[];
+}
+
 export const HomePage: React.FC = () => {
-  const [deals, setDeals] = useState<Product[]>([]);
-  const [bestsellers, setBestsellers] = useState<Product[]>([]);
-  const [freshToday, setFreshToday] = useState<Product[]>([]);
-  const [festiveSweets, setFestiveSweets] = useState<Product[]>([]);
-  const [combos, setCombos] = useState<Product[]>([]);
+  const [data, setData] = useState<HomeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadHome = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [deals, featured, fresh, sweets, combos] = await Promise.all([
+        api.getDeals(),
+        api.getFeatured(),
+        api.getFreshToday(),
+        api.getFestiveSweets(),
+        api.getProducts({ category: 'combo-packs', pageSize: 8 }),
+      ]);
+
+      setData({
+        deals: deals.products,
+        dealEndsAt: deals.endsAt,
+        featured,
+        fresh,
+        sweets,
+        combos: combos.products,
+      });
+    } catch (err) {
+      setData(null);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'The DesiDhar storefront could not be loaded. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let mounted = true;
-    const fetchHomeData = async () => {
-      try {
-        const [d, b, f, s, c] = await Promise.all([
-          api.getDealOfTheDay(),
-          api.getBestSellers(),
-          api.getFreshToday(),
-          api.getFestiveSweets(),
-          api.getProducts({ category: 'combo-packs' }),
-        ]);
-
-        if (mounted) {
-          setDeals(d);
-          setBestsellers(b);
-          setFreshToday(f);
-          setFestiveSweets(s);
-          setCombos(c.products);
-        }
-      } catch (err) {
-        console.error('Failed to load home data', err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchHomeData();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    void loadHome();
+  }, [loadHome]);
 
   return (
     <>
@@ -58,79 +69,88 @@ export const HomePage: React.FC = () => {
         <title>DesiDhar | Khaalis Desi, Seedha Ghar Tak — Fresh Indian Dairy &amp; Mithai</title>
         <meta
           name="description"
-          content="Order farm-fresh A2 Gir Cow Milk, Vedic Bilona Ghee, Safed Makkhan, fresh paneer, matka dahi, and 100% Shuddh Ghee sweets online. Cold-chain doorstep delivery guaranteed before 7 AM."
+          content="Order DesiDhar milk, ghee, makkhan, paneer, dahi, cream and mithai online. Live prices, stock and delivery slots."
         />
       </Helmet>
 
-      {/* 1. Category Strip */}
       <CategoryStrip />
-
-      {/* 2. Hero Carousel */}
       <HeroCarousel />
 
-      {/* 3. Deal of the Day with Live Countdown */}
-      {loading ? (
+      {loading && (
         <div className="max-w-7xl mx-auto px-4 my-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <ProductCardSkeleton key={i} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((index) => (
+              <ProductCardSkeleton key={index} />
             ))}
           </div>
         </div>
-      ) : (
-        <DealOfTheDay products={deals} />
       )}
 
-      {/* 4. Best Sellers Section */}
-      <ProductSection
-        title="DesiDhar Bestsellers"
-        subtitle="Most loved dairy staples trusted by 50,000+ Indian households"
-        icon={<Sparkles className="w-5 h-5 text-amber-500" />}
-        badge="Top Rated"
-        products={bestsellers}
-        viewAllLink="/category/all"
-      />
+      {!loading && error && (
+        <div className="max-w-3xl mx-auto px-4 my-10">
+          <ErrorState
+            title="The catalogue is unavailable"
+            message={error}
+            onRetry={() => void loadHome()}
+          />
+        </div>
+      )}
 
-      {/* 5. Fresh Today (Cold-Chain Drop) */}
-      <ProductSection
-        title="Harvest Fresh Today"
-        subtitle="Raw chilled milk, cloud-soft malai paneer, and pot dahi set this morning"
-        icon={<Sun className="w-5 h-5 text-emerald-600" />}
-        badge="Morning Batch"
-        products={freshToday}
-        viewAllLink="/category/milk"
-        bgWhite
-      />
+      {!loading && !error && data && (
+        <>
+          <DealOfTheDay products={data.deals} endsAt={data.dealEndsAt} />
 
-      {/* 6. Visual Category Grid */}
-      <CategoryGrid />
+          <ProductSection
+            title="Featured by DesiDhar"
+            subtitle="Products our kitchen has flagged as featured right now"
+            icon={<Sparkles className="w-5 h-5 text-amber-500" />}
+            badge="Featured"
+            products={data.featured}
+            viewAllLink="/category/all"
+          />
 
-      {/* 7. Festive Sweets & Royal Mithai */}
-      <ProductSection
-        title="Festive Sweets &amp; Royal Mithai"
-        subtitle="Handcrafted in 100% Shuddh Desi Ghee. No silver paper adulteration."
-        icon={<Gift className="w-5 h-5 text-amber-600" />}
-        badge="Pure Ghee Sweets"
-        products={festiveSweets}
-        viewAllLink="/category/mithai"
-      />
+          <ProductSection
+            title="Fresh Today"
+            subtitle="Dairy prepared for today's delivery slots"
+            icon={<Sun className="w-5 h-5 text-emerald-600" />}
+            badge="Morning Batch"
+            products={data.fresh}
+            viewAllLink="/category/milk"
+            bgWhite
+          />
 
-      {/* 8. Combos & Bundles */}
-      <ProductSection
-        title="Daily Breakfast &amp; Kitchen Combos"
-        subtitle="Bundle your morning essentials and save up to 25%"
-        icon={<PackageCheck className="w-5 h-5 text-amber-600" />}
-        badge="Save More"
-        products={combos}
-        viewAllLink="/category/combo-packs"
-        bgWhite
-      />
+          <CategoryGrid />
 
-      {/* 9. Why DesiDhar (Purity & Cold-Chain Promise) */}
-      <WhyDesiDhar />
+          <ProductSection
+            title="Festive Sweets &amp; Royal Mithai"
+            subtitle="Ghee sweets and gift boxes from the live mithai counter"
+            icon={<Gift className="w-5 h-5 text-amber-600" />}
+            badge="Mithai"
+            products={data.sweets}
+            viewAllLink="/category/mithai"
+          />
 
-      {/* 10. Customer Reviews */}
-      <CustomerReviews />
+          <ProductSection
+            title="Daily Breakfast &amp; Kitchen Combos"
+            subtitle="Bundles assembled from the current catalogue"
+            icon={<PackageCheck className="w-5 h-5 text-amber-600" />}
+            badge="Combos"
+            products={data.combos}
+            viewAllLink="/category/combo-packs"
+            bgWhite
+          />
+
+          {data.deals.length === 0 && (
+            <p className="text-center text-xs text-stone-500 -mt-4 mb-8">
+              <Flame className="w-3.5 h-3.5 inline mr-1" />
+              No promotion is running right now.
+            </p>
+          )}
+
+          <WhyDesiDhar />
+          <CustomerReviews />
+        </>
+      )}
     </>
   );
 };

@@ -3,26 +3,43 @@ import { Helmet } from 'react-helmet-async';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
 import { Input } from '../components/common/Input';
-import { useUiStore } from '../store/uiStore';
-import { PhoneCall, Mail, MapPin, Clock, MessageSquare, Send } from 'lucide-react';
+import { useStorefront } from '../context/StorefrontContext';
+import { api } from '../services/api';
+import { PhoneCall, Mail, MapPin, Clock, MessageSquare, Send, AlertCircle } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
-  const { addToast } = useUiStore();
+  const { settings } = useStorefront();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [subject, setSubject] = useState('General Inquiry');
+  const [subject, setSubject] = useState('General enquiry');
   const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !phone || !message) {
-      addToast('Please fill out all required fields.', 'error');
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError('');
+    if (!name.trim() || !phone.trim() || !message.trim()) {
+      setError('Name, phone and message are required.');
       return;
     }
-    setSubmitted(true);
-    addToast('Your message has been sent to DesiDhar Customer Care!', 'success');
+    setSubmitting(true);
+    try {
+      const receipt = await api.submitContact({
+        name: name.trim(),
+        email: email.trim() || undefined,
+        phone: phone.trim(),
+        subject: subject.trim() || undefined,
+        message: message.trim(),
+      });
+      setTicketId(receipt.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Your message could not be sent.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const breadcrumbs = [{ label: 'Contact Us' }];
@@ -30,10 +47,10 @@ export const ContactPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Customer Care | DesiDhar Pure Dairy</title>
+        <title>Contact Customer Care | DesiDhar</title>
         <meta
           name="description"
-          content="Get in touch with DesiDhar customer support for inquiries on morning milk deliveries, corporate festive gifting, or quality verification."
+          content="Contact DesiDhar customer support about orders, delivery slots or product quality."
         />
       </Helmet>
 
@@ -42,152 +59,178 @@ export const ContactPage: React.FC = () => {
 
         <div className="text-center max-w-xl mx-auto space-y-2">
           <h1 className="text-3xl sm:text-4xl font-black font-heading tracking-tight text-[#331B0B]">
-            We&apos;re Always Here to Help
+            We&apos;re here to help
           </h1>
           <p className="text-xs sm:text-sm text-stone-500">
-            Have questions about morning delivery, cold-chain temperature, or bulk festive sweets? Reach out anytime.
+            Send us a message and the support team will reply using the contact details you provide.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          {/* Left: Contact Info */}
           <div className="md:col-span-5 space-y-4">
             <div className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-5 text-xs">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                  <PhoneCall className="w-5 h-5" />
+              {settings?.supportPhone && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <PhoneCall className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#4A2C17]">Phone support</h4>
+                    <a
+                      href={`tel:${settings.supportPhone.replace(/\s+/g, '')}`}
+                      className="text-stone-600 mt-0.5 font-mono block hover:text-amber-700"
+                    >
+                      {settings.supportPhone}
+                    </a>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-[#4A2C17]">Toll-Free Helplines</h4>
-                  <p className="text-stone-600 mt-0.5 font-mono">+91 1800-DESI-DHAR</p>
-                  <p className="text-stone-600 font-mono">+91 98765-43210 (WhatsApp Care)</p>
-                </div>
-              </div>
+              )}
 
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5" />
+              {settings?.supportEmail && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#4A2C17]">Email support</h4>
+                    <a
+                      href={`mailto:${settings.supportEmail}`}
+                      className="text-stone-600 mt-0.5 block hover:text-amber-700"
+                    >
+                      {settings.supportEmail}
+                    </a>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-[#4A2C17]">Email Support</h4>
-                  <p className="text-stone-600 mt-0.5">care@desidhar.com</p>
-                  <p className="text-stone-600">orders@desidhar.com</p>
-                </div>
-              </div>
+              )}
 
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
+              {settings?.supportHours && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#4A2C17]">Support hours</h4>
+                    <p className="text-stone-600 mt-0.5">{settings.supportHours}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-[#4A2C17]">Operational Hours</h4>
-                  <p className="text-stone-600 mt-0.5">Morning Milk Support: 5:30 AM – 10:00 AM</p>
-                  <p className="text-stone-600">General Support: 9:00 AM – 9:00 PM (Daily)</p>
-                </div>
-              </div>
+              )}
 
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5" />
+              {settings?.companyAddress && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#4A2C17]">Registered address</h4>
+                    <p className="text-stone-600 mt-0.5 leading-relaxed">
+                      {settings.companyAddress}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-sm text-[#4A2C17]">Central Dairy Dispatch Hub</h4>
-                  <p className="text-stone-600 mt-0.5 leading-relaxed">
-                    DesiDhar Agrifoods Pvt. Ltd.<br />
-                    Plot 42, Cold Chain Logistics Park, Mathura Road, NCR 110001
-                  </p>
+              )}
+
+              {!settings?.supportPhone && !settings?.supportEmail && (
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#4A2C17]">Support details not published</h4>
+                    <p className="text-stone-600 mt-0.5 leading-relaxed">
+                      Phone and email contact details have not been configured for this storefront
+                      yet. Send the form and the team will still receive your message.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Right: Message Form */}
           <div className="md:col-span-7 bg-white rounded-3xl border border-stone-200/90 p-6 sm:p-8 shadow-xs">
-            {submitted ? (
+            {ticketId ? (
               <div className="text-center py-10 space-y-3">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                   <MessageSquare className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold font-heading text-[#4A2C17]">
-                  Message Received!
-                </h3>
+                <h3 className="text-lg font-bold font-heading text-[#4A2C17]">Message received</h3>
                 <p className="text-xs text-stone-500 max-w-sm mx-auto">
-                  Thank you for reaching out. One of our customer dairy executives will get in touch with you within 2 hours.
+                  Your reference is <span className="font-mono font-bold">{ticketId}</span>. The
+                  support team will reply using the contact details you provided.
                 </p>
-                <Button variant="outline" size="sm" onClick={() => setSubmitted(false)}>
-                  Send Another Message
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setTicketId(null);
+                    setName('');
+                    setEmail('');
+                    setPhone('');
+                    setMessage('');
+                  }}
+                >
+                  Send another message
                 </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <h3 className="text-lg font-bold font-heading text-[#4A2C17]">
-                  Drop Us a Message
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Your Name *"
-                    placeholder="e.g. Priyadarshini Gupta"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Full name"
                     required
                   />
                   <Input
                     label="Phone Number *"
-                    placeholder="10-digit mobile number"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(event) => setPhone(event.target.value.replace(/\D/g, ''))}
+                    placeholder="10-digit mobile number"
+                    maxLength={10}
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label="Email Address"
+                    label="Email (optional)"
                     type="email"
-                    placeholder="name@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
                   />
-                  <div>
-                    <label className="block text-xs font-semibold text-[#4A2C17] uppercase tracking-wider mb-1.5">
-                      Subject
-                    </label>
-                    <select
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      className="w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-xs font-medium text-[#4A2C17] bg-white focus:outline-none focus:border-amber-500"
-                    >
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Morning Milk Delivery Issue">Morning Milk Delivery Issue</option>
-                      <option value="Corporate / Wedding Gifting">Corporate / Wedding Gifting</option>
-                      <option value="Quality & Lab Reports">Quality &amp; Lab Reports</option>
-                      <option value="Dairy Partnership / Farmer Inquiry">Dairy Partnership / Farmer Inquiry</option>
-                    </select>
-                  </div>
+                  <Input
+                    label="Subject"
+                    value={subject}
+                    onChange={(event) => setSubject(event.target.value)}
+                    placeholder="How can we help?"
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#4A2C17] uppercase tracking-wider mb-1.5">
-                    Your Message *
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#4A2C17] mb-1.5">
+                    Message *
                   </label>
                   <textarea
-                    rows={4}
+                    rows={5}
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="How can we assist you with your dairy needs?"
-                    className="w-full rounded-xl border border-stone-200 p-3.5 text-xs text-[#4A2C17] focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                    onChange={(event) => setMessage(event.target.value)}
+                    placeholder="Tell us what you need help with."
+                    className="w-full rounded-xl border border-stone-200 p-3 text-xs focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-[#4A2C17]"
                     required
                   />
                 </div>
+
+                {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
 
                 <Button
                   type="submit"
                   variant="gold"
                   size="md"
+                  isLoading={submitting}
                   rightIcon={<Send className="w-4 h-4" />}
                 >
-                  Send Message
+                  Send message
                 </Button>
               </form>
             )}

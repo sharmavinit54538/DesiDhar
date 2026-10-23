@@ -4,13 +4,13 @@ import { formatINR } from '../../utils/formatters';
 
 interface FreeDeliveryBarProps {
   currentTotal: number;
-  threshold?: number;
+  /** Comes from GET /api/settings; there is no client-side default. */
+  threshold: number;
 }
 
-export const FreeDeliveryBar: React.FC<FreeDeliveryBarProps> = ({
-  currentTotal,
-  threshold = 499,
-}) => {
+export const FreeDeliveryBar: React.FC<FreeDeliveryBarProps> = ({ currentTotal, threshold }) => {
+  if (!threshold || threshold <= 0) return null;
+
   const isFree = currentTotal >= threshold;
   const remaining = Math.max(0, threshold - currentTotal);
   const percentage = Math.min(100, Math.round((currentTotal / threshold) * 100));
@@ -27,21 +27,19 @@ export const FreeDeliveryBar: React.FC<FreeDeliveryBarProps> = ({
           <span>
             {isFree ? (
               <span className="text-emerald-800 font-extrabold">
-                Yay! You unlocked FREE 4°C Cold-Chain Delivery!
+                Free delivery unlocked on this order.
               </span>
             ) : (
               <span>
-                Add <strong className="text-amber-800">{formatINR(remaining)}</strong> more of fresh dairy to get <strong>FREE delivery</strong>
+                Add <strong className="text-amber-800">{formatINR(remaining)}</strong> more to get{' '}
+                <strong>free delivery</strong>
               </span>
             )}
           </span>
         </div>
-        <span className="text-xs font-bold text-stone-500 font-mono">
-          {percentage}%
-        </span>
+        <span className="text-xs font-bold text-stone-500 font-mono">{percentage}%</span>
       </div>
 
-      {/* Progress Bar */}
       <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
         <div
           className={`h-full transition-all duration-500 rounded-full ${

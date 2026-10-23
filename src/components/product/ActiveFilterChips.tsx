@@ -65,10 +65,10 @@ export const ActiveFilterChips: React.FC = () => {
     });
   }
 
-  if (filters.priceRange[0] > 0 || filters.priceRange[1] < 8000) {
+  if (filters.priceRange[0] > 0 || filters.priceRange[1] < 100000) {
     chips.push({
       label: `₹${filters.priceRange[0]} - ₹${filters.priceRange[1]}`,
-      onRemove: () => setPriceRange([0, 8000]),
+      onRemove: () => setPriceRange([0, 100000]),
     });
   }
 

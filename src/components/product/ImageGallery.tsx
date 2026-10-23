@@ -1,312 +1,240 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import type { ProductImage } from '../../types';
-import { VegBadge } from '../common/VegBadge';
-import { Badge } from '../common/Badge';
-import {
-  Zap,
-  ZoomIn,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Maximize2,
-  Camera,
-  CheckCircle2,
-} from 'lucide-react';
+import { handleImageError } from '../../utils/imageResolver';
 import { cn } from '../../utils/cn';
 
 interface ImageGalleryProps {
-  images: (string | ProductImage)[];
+  images: ProductImage[];
   productName: string;
+  category?: string;
   isDeal?: boolean;
   isFresh?: boolean;
 }
 
+/**
+ * Product gallery. Photos come straight from product_images; the badge tells the
+ * shopper when a tile is a category placeholder rather than a photo of this
+ * exact product.
+ */
 export const ImageGallery: React.FC<ImageGalleryProps> = ({
   images,
   productName,
-  isDeal,
-  isFresh,
+  category,
+  isDeal = false,
+  isFresh = false,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [brokenIds, setBrokenIds] = useState<Record<string, boolean>>({});
   const touchStartX = useRef<number | null>(null);
 
-  const getSrc = (img: string | ProductImage): string => {
-    return typeof img === 'string' ? img : img.src;
-  };
+  const safeImages = images.length > 0 ? images : [];
+  const activeImage = safeImages[Math.min(activeIndex, safeImages.length - 1)];
 
-  const getAlt = (img: string | ProductImage, idx: number): string => {
-    if (typeof img === 'string') return `${productName} view ${idx + 1}`;
-    return img.alt || `${productName} view ${idx + 1}`;
-  };
-
-  const getAttribution = (img: string | ProductImage) => {
-    if (typeof img === 'string') return null;
-    return img.attribution;
-  };
-
-  const activeImage = images[activeIndex] || images[0];
-  const activeSrc = getSrc(activeImage);
-  const activeAlt = getAlt(activeImage, activeIndex);
-  const activeAttribution = getAttribution(activeImage);
-
-  const nextImage = () => {
-    setActiveIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        nextImage();
-      } else if (e.key === 'ArrowLeft') {
-        prevImage();
-      } else if (e.key === 'Escape' && isLightboxOpen) {
-        setIsLightboxOpen(false);
+    setActiveIndex(0);
+  }, [productName]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsFullscreen(false);
+      if (event.key === 'ArrowLeft') {
+        setActiveIndex((i) => (i - 1 + safeImages.length) % safeImages.length);
+      }
+      if (event.key === 'ArrowRight') {
+        setActiveIndex((i) => (i + 1) % safeImages.length);
       }
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isFullscreen, safeImages.length]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [images.length, isLightboxOpen]);
+  if (!activeImage) {
+    return (
+      <div className="aspect-square rounded-3xl bg-stone-100 flex items-center justify-center text-sm text-stone-500">
+        No image available for this product.
+      </div>
+    );
+  }
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setMousePos({ x, y });
-  };
+  const isPlaceholder =
+    brokenIds[activeImage.id] === true ||
+    activeImage.isVerifiedSpecific === false ||
+    activeImage.type === 'placeholder';
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current !== null) {
-      const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-      if (deltaX > 45) {
-        prevImage();
-      } else if (deltaX < -45) {
-        nextImage();
-      }
-      touchStartX.current = null;
-    }
+  const goTo = (index: number) => {
+    if (safeImages.length === 0) return;
+    setActiveIndex((index + safeImages.length) % safeImages.length);
   };
 
   return (
-    <div className="flex flex-col gap-3.5 select-none">
-      {/* Main Image Frame with Zoom & Swipe */}
-      <div
-        onMouseEnter={() => setIsZoomed(true)}
-        onMouseLeave={() => setIsZoomed(false)}
-        onMouseMove={handleMouseMove}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => setIsLightboxOpen(true)}
-        className="relative aspect-square w-full rounded-3xl overflow-hidden bg-stone-50 border border-stone-200/90 shadow-xs cursor-pointer group"
-      >
-        <img
-          src={activeSrc}
-          alt={activeAlt}
-          className={cn(
-            'w-full h-full object-cover transition-transform duration-150',
-            isZoomed ? 'scale-135 origin-center' : 'scale-100'
+    <>
+      <div className="space-y-3">
+        <div
+          className="relative aspect-square bg-white rounded-3xl border border-stone-200 overflow-hidden group"
+          onTouchStart={(event) => {
+            touchStartX.current = event.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(event) => {
+            if (touchStartX.current === null) return;
+            const delta = (event.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+            if (Math.abs(delta) > 50) {
+              goTo(delta > 0 ? activeIndex - 1 : activeIndex + 1);
+            }
+            touchStartX.current = null;
+          }}
+        >
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+            {isDeal && (
+              <span className="px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wide shadow">
+                Deal
+              </span>
+            )}
+            {isFresh && (
+              <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wide shadow">
+                Fresh
+              </span>
+            )}
+          </div>
+
+          {isPlaceholder && (
+            <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-stone-800/85 text-white text-[10px] font-semibold">
+              {brokenIds[activeImage.id]
+                ? 'Image unavailable'
+                : 'Category representative image'}
+            </div>
           )}
-          style={
-            isZoomed
-              ? {
-                  transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
-                }
-              : undefined
-          }
-        />
 
-        {/* Badges Overlay */}
-        <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-10 pointer-events-none">
-          {isDeal && (
-            <Badge variant="deal" size="md">
-              <Zap className="w-3.5 h-3.5 mr-1 fill-current" /> Deal of the Day
-            </Badge>
-          )}
-          {isFresh && (
-            <Badge variant="fresh" size="md">
-              Fresh Morning Stock
-            </Badge>
-          )}
-          <span className="bg-stone-900/80 backdrop-blur-xs text-amber-300 text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider">
-            100% Real Photo
-          </span>
-        </div>
-
-        {/* Veg badge overlay */}
-        <div className="absolute top-4 right-4 z-10 bg-white/90 p-1.5 rounded-lg backdrop-blur-xs shadow-xs">
-          <VegBadge size="md" showLabel />
-        </div>
-
-        {/* Lightbox Trigger Hint */}
-        <div className="absolute bottom-3 right-3 bg-stone-900/75 text-white text-[11px] font-semibold px-2.5 py-1 rounded-xl backdrop-blur-xs flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
-          <Maximize2 className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Click for Lightbox</span>
-          <span className="sm:hidden">Tap to Zoom</span>
-        </div>
-
-        {/* Mobile Swipe Navigation Controls */}
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                prevImage();
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(true)}
+            className="w-full h-full cursor-zoom-in"
+            aria-label={`Open larger image of ${productName}`}
+          >
+            <img
+              key={activeImage.id}
+              src={activeImage.src}
+              srcSet={activeImage.srcset || undefined}
+              sizes={activeImage.sizes || '(min-width: 1024px) 40vw, 100vw'}
+              alt={activeImage.alt || productName}
+              width={activeImage.width || 800}
+              height={activeImage.height || 800}
+              loading="eager"
+              onError={(event) => {
+                setBrokenIds((prev) => ({ ...prev, [activeImage.id]: true }));
+                handleImageError(event, category);
               }}
-              aria-label="Previous photo"
-              className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-stone-700 shadow-md"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                nextImage();
-              }}
-              aria-label="Next photo"
-              className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-stone-700 shadow-md"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </>
-        )}
+              className={cn(
+                'w-full h-full object-cover transition-transform duration-300',
+                isZoomed ? 'scale-125' : 'group-hover:scale-[1.03]'
+              )}
+            />
+          </button>
 
-        {/* Mobile Dot Indicators */}
-        {images.length > 1 && (
-          <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-full">
-            {images.map((_, idx) => (
-              <span
-                key={idx}
+          <button
+            type="button"
+            onClick={() => setIsZoomed((value) => !value)}
+            className="absolute bottom-3 right-3 p-2 rounded-full bg-white/90 border border-stone-200 text-stone-600 hover:text-amber-700"
+            aria-label={isZoomed ? 'Zoom out' : 'Zoom in'}
+          >
+            <Expand className="w-4 h-4" />
+          </button>
+
+          {safeImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goTo(activeIndex - 1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 border border-stone-200"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => goTo(activeIndex + 1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 border border-stone-200"
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
+        </div>
+
+        {safeImages.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {safeImages.map((image, index) => (
+              <button
+                key={image.id}
+                type="button"
+                onClick={() => setActiveIndex(index)}
                 className={cn(
-                  'h-1.5 rounded-full transition-all',
-                  idx === activeIndex ? 'w-4 bg-amber-400' : 'w-1.5 bg-white/60'
+                  'w-16 h-16 shrink-0 rounded-xl overflow-hidden border bg-white',
+                  index === activeIndex
+                    ? 'border-amber-500 ring-2 ring-amber-200'
+                    : 'border-stone-200'
                 )}
-              />
+                aria-label={`View image ${index + 1} of ${safeImages.length}`}
+              >
+                <img
+                  src={image.src}
+                  alt=""
+                  loading="lazy"
+                  onError={(event) => handleImageError(event, category)}
+                  className="w-full h-full object-cover"
+                />
+              </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Thumbnails list (Desktop & Tablet) */}
-      {images.length > 1 && (
-        <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1">
-          {images.map((img, idx) => {
-            const src = getSrc(img);
-            const isSelected = activeIndex === idx;
-
-            return (
+      {isFullscreen && (
+        <div
+          className="fixed inset-0 z-50 bg-stone-950/90 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white"
+            aria-label="Close image viewer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <img
+            src={activeImage.src}
+            alt={activeImage.alt || productName}
+            onError={(event) => handleImageError(event, category)}
+            className="max-h-[85vh] max-w-full object-contain"
+          />
+          {safeImages.length > 1 && (
+            <>
               <button
-                key={idx}
                 type="button"
-                onClick={() => setActiveIndex(idx)}
-                className={cn(
-                  'relative w-18 h-18 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0',
-                  isSelected
-                    ? 'border-amber-500 ring-2 ring-amber-500/20 shadow-xs scale-102'
-                    : 'border-stone-200 opacity-70 hover:opacity-100 hover:border-amber-300'
-                )}
+                onClick={() => goTo(activeIndex - 1)}
+                className="absolute left-4 p-3 rounded-full bg-white/10 text-white"
+                aria-label="Previous image"
               >
-                <img src={src} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                {isSelected && (
-                  <div className="absolute inset-0 bg-amber-500/10 pointer-events-none" />
-                )}
+                <ChevronLeft className="w-6 h-6" />
               </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Image Attribution Notice (Clean, non-intrusive) */}
-      {activeAttribution && (
-        <div className="flex items-center gap-1.5 text-[11px] text-stone-500 px-1">
-          <Camera className="w-3.5 h-3.5 text-stone-400" />
-          <span>
-            Photo by <strong>{activeAttribution.photographer}</strong> • {activeAttribution.license}
-          </span>
-        </div>
-      )}
-
-      {/* Full-Screen Lightbox Modal */}
-      {isLightboxOpen && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-4 sm:p-6 animate-in fade-in duration-200">
-          {/* Top Bar */}
-          <div className="w-full max-w-5xl flex items-center justify-between text-white pb-3 border-b border-stone-800">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold truncate">{productName}</h3>
-              <p className="text-xs text-stone-400">
-                Image {activeIndex + 1} of {images.length}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsLightboxOpen(false)}
-              aria-label="Close Lightbox"
-              className="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 flex items-center justify-center text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Central High-Res Image with Nav Arrows */}
-          <div className="relative w-full max-w-4xl max-h-[75vh] flex items-center justify-center my-auto">
-            <button
-              type="button"
-              onClick={prevImage}
-              aria-label="Previous"
-              className="absolute left-2 sm:-left-12 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white text-white hover:text-stone-900 flex items-center justify-center backdrop-blur-xs transition-all"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <img
-              src={activeSrc}
-              alt={activeAlt}
-              className="max-h-[72vh] max-w-full rounded-2xl object-contain shadow-2xl"
-            />
-
-            <button
-              type="button"
-              onClick={nextImage}
-              aria-label="Next"
-              className="absolute right-2 sm:-right-12 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white text-white hover:text-stone-900 flex items-center justify-center backdrop-blur-xs transition-all"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Bottom Thumbnails Strip */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 max-w-2xl">
-            {images.map((img, idx) => (
               <button
-                key={idx}
                 type="button"
-                onClick={() => setActiveIndex(idx)}
-                className={cn(
-                  'w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0',
-                  activeIndex === idx
-                    ? 'border-amber-400 ring-2 ring-amber-400/50 scale-105'
-                    : 'border-stone-700 opacity-60 hover:opacity-100'
-                )}
+                onClick={() => goTo(activeIndex + 1)}
+                className="absolute right-4 p-3 rounded-full bg-white/10 text-white"
+                aria-label="Next image"
               >
-                <img src={getSrc(img)} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                <ChevronRight className="w-6 h-6" />
               </button>
-            ))}
-          </div>
+            </>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 };

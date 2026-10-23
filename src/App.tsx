@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { MainLayout } from './layouts/MainLayout';
 import { Skeleton } from './components/common/Skeleton';
+import { StorefrontProvider } from './context/StorefrontContext';
 
 // Lazy-loaded routes for optimal code splitting & fast load times
 const HomePage = lazy(() =>
@@ -56,6 +57,9 @@ const TermsPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
 );
+const AdminPage = lazy(() =>
+  import('./pages/AdminPage').then((m) => ({ default: m.AdminPage }))
+);
 
 // Fallback loading skeleton for Suspense transitions
 const PageLoadingFallback: React.FC = () => (
@@ -80,8 +84,9 @@ export function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <Suspense fallback={<PageLoadingFallback />}>
-          <Routes>
+        <StorefrontProvider>
+          <Suspense fallback={<PageLoadingFallback />}>
+            <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
               <Route path="category/:categorySlug" element={<ProductListingPage />} />
@@ -100,10 +105,12 @@ export function App() {
               <Route path="shipping-returns" element={<ShippingReturnsPage />} />
               <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="terms" element={<TermsPage />} />
+              <Route path="admin" element={<AdminPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </StorefrontProvider>
       </BrowserRouter>
     </HelmetProvider>
   );

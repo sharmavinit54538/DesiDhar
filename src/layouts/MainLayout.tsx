@@ -6,6 +6,7 @@ import { MobileBottomNav } from '../components/common/MobileBottomNav';
 import { ToastContainer } from '../components/common/Toast';
 import { AuthModal } from '../components/common/AuthModal';
 import { PincodeModal } from '../components/common/PincodeModal';
+import { SessionBootstrap } from '../components/common/SessionBootstrap';
 
 export const MainLayout: React.FC = () => {
   const { pathname } = useLocation();
@@ -17,6 +18,7 @@ export const MainLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFDF9] text-[#4A2C17]">
+      <SessionBootstrap />
       <Navbar />
 
       <main className="flex-1 pb-20 md:pb-0 min-w-0">
