@@ -1,8 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
+import { useStorefront } from '../context/StorefrontContext';
 
 export const PrivacyPolicyPage: React.FC = () => {
+  const { settings } = useStorefront();
   const breadcrumbs = [{ label: 'Privacy Policy' }];
 
   return (
@@ -33,7 +35,10 @@ export const PrivacyPolicyPage: React.FC = () => {
               1. Information We Collect
             </h2>
             <p>
-              When you use DesiDhar, we collect your phone number (for OTP authentication), name, delivery address, and pincode (for cold-chain delivery serviceability). We do NOT store your sensitive banking passwords, credit card numbers, or CVVs. All payment transactions are handled via RBI-authorized payment gateways.
+              When you use DesiDhar, we collect the mobile number used for OTP sign-in, your name
+              and the delivery addresses you save. Pincodes are used to check delivery
+              serviceability. Card and UPI credentials are entered on the payment provider’s page
+              and are never stored by DesiDhar.
             </p>
           </section>
 
@@ -42,7 +47,8 @@ export const PrivacyPolicyPage: React.FC = () => {
               2. How We Use Your Data
             </h2>
             <p>
-              Your personal information is used exclusively to dispatch orders, send early-morning cold-chain tracking SMS/WhatsApp alerts, prevent fraudulent transactions, and improve your dairy shopping experience.
+              Your information is used to authenticate you, fulfil orders, provide order status
+              updates and prevent fraudulent activity.
             </p>
           </section>
 
@@ -51,7 +57,8 @@ export const PrivacyPolicyPage: React.FC = () => {
               3. Zero Spam &amp; No Third-Party Data Selling
             </h2>
             <p>
-              We honor your trust. DesiDhar never sells, rents, or trades your contact details or address books to third-party telemarketers or advertisers. All notifications can be managed directly from your profile settings.
+              DesiDhar does not sell your contact details or addresses to third-party marketers.
+              Notifications you receive are transactional, such as order confirmations and OTPs.
             </p>
           </section>
 
@@ -60,7 +67,15 @@ export const PrivacyPolicyPage: React.FC = () => {
               4. Contact Grievance Officer
             </h2>
             <p>
-              For questions regarding your data privacy, contact our Data Protection Officer at: <strong>privacy@desidhar.com</strong>.
+              For questions about your personal data, contact customer care
+              {settings?.supportEmail ? (
+                <>
+                  {' '}at <strong>{settings.supportEmail}</strong>
+                </>
+              ) : (
+                ' through the contact form'
+              )}
+              .
             </p>
           </section>
         </div>

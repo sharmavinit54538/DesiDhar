@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import { Button } from '../components/common/Button';
@@ -9,8 +10,6 @@ import { AddressFormModal } from '../components/checkout/AddressFormModal';
 import type { Address } from '../types';
 import {
   User,
-  Phone,
-  Mail,
   MapPin,
   Plus,
   Edit2,
@@ -20,19 +19,37 @@ import {
   Package,
   Heart,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
-  const { user, updateProfile, addAddress, updateAddress, deleteAddress, setDefaultAddress, logout } =
-    useAuthStore();
+  const {
+    user,
+    addresses,
+    updateProfile,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress,
+    logout,
+    refreshAddresses,
+  } = useAuthStore();
   const { openAuthModal, addToast } = useUiStore();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState('');
 
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addressError, setAddressError] = useState('');
+
+  useEffect(() => {
+    if (!user) return;
+    setName(user.name || '');
+    setEmail(user.email || '');
+    void refreshAddresses().catch(() => undefined);
+  }, [user, refreshAddresses]);
 
   if (!user) {
     return (
@@ -41,36 +58,48 @@ export const ProfilePage: React.FC = () => {
           <User className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-bold font-heading text-[#4A2C17]">
-          Sign in to view your DesiDhar Profile
+          Sign in to view your DesiDhar profile
         </h2>
         <p className="text-xs text-stone-500 max-w-sm mx-auto">
-          Manage your daily morning milk deliveries, saved addresses, and active orders.
+          Manage your delivery addresses, orders and saved products.
         </p>
-        <div>
-          <Button variant="gold" onClick={() => openAuthModal()}>
-            Login with Mobile OTP
-          </Button>
-        </div>
+        <Button variant="gold" onClick={() => openAuthModal()}>
+          Login with Mobile OTP
+        </Button>
       </div>
     );
   }
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateProfile({ name, email });
-    setIsEditingProfile(false);
-    addToast('Profile updated successfully!', 'success');
+  const handleSaveProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setProfileError('');
+    setSavingProfile(true);
+    try {
+      await updateProfile({ name: name.trim(), email: email.trim() });
+      setIsEditingProfile(false);
+      addToast('Profile updated.', 'success');
+    } catch (err) {
+      setProfileError(err instanceof Error ? err.message : 'Profile could not be updated.');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
-  const handleSaveAddress = (data: Omit<Address, 'id'>) => {
-    if (editingAddress) {
-      updateAddress(editingAddress.id, data);
-      addToast('Address updated!', 'success');
-    } else {
-      addAddress(data);
-      addToast('New address saved!', 'success');
+  const handleSaveAddress = async (data: Omit<Address, 'id'>) => {
+    setAddressError('');
+    try {
+      if (editingAddress) {
+        await updateAddress(editingAddress.id, data);
+        addToast('Address updated.', 'success');
+      } else {
+        await addAddress(data);
+        addToast('Address saved.', 'success');
+      }
+      setEditingAddress(null);
+    } catch (err) {
+      setAddressError(err instanceof Error ? err.message : 'The address could not be saved.');
+      throw err;
     }
-    setEditingAddress(null);
   };
 
   const breadcrumbs = [{ label: 'My Account' }, { label: 'Profile & Addresses' }];
@@ -84,23 +113,27 @@ export const ProfilePage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-8">
         <Breadcrumbs items={breadcrumbs} />
 
-        {/* Top Profile Banner */}
         <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 rounded-3xl p-6 sm:p-8 text-stone-950 shadow-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white text-stone-900 font-extrabold text-2xl flex items-center justify-center shadow-md">
-              {user.name.slice(0, 1).toUpperCase()}
+              {(user.name || user.phone).slice(0, 1).toUpperCase()}
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black font-heading text-[#2C180B]">
-                {user.name}
+                {user.name || 'DesiDhar customer'}
               </h1>
               <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-stone-800 mt-1">
-                <span className="font-mono">+91 {user.phone}</span>
+                <span className="font-mono">{user.phone}</span>
                 {user.email && (
                   <>
                     <span>•</span>
                     <span>{user.email}</span>
                   </>
+                )}
+                {user.role === 'admin' && (
+                  <span className="px-2 py-0.5 rounded bg-stone-900 text-amber-300 text-[10px] font-bold uppercase">
+                    Admin
+                  </span>
                 )}
               </div>
             </div>
@@ -118,18 +151,29 @@ export const ProfilePage: React.FC = () => {
               </Button>
             </Link>
 
+            <Link to="/wishlist">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white/90 text-stone-900 font-bold border-none"
+                leftIcon={<Heart className="w-4 h-4" />}
+              >
+                Wishlist
+              </Button>
+            </Link>
+
             <button
               type="button"
-              onClick={logout}
+              onClick={() => void logout()}
               className="p-2.5 rounded-xl bg-stone-900/10 hover:bg-stone-900/20 text-stone-950 transition-colors"
-              title="Sign Out"
+              title="Sign out"
+              aria-label="Sign out"
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Profile Details Edit Card */}
         <div className="bg-white rounded-3xl border border-stone-200/90 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-stone-100">
             <h3 className="font-bold text-sm text-[#4A2C17] font-heading uppercase tracking-wider">
@@ -149,16 +193,17 @@ export const ProfilePage: React.FC = () => {
               <Input
                 label="Full Name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(event) => setName(event.target.value)}
                 required
               />
               <Input
                 label="Email Address"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(event) => setEmail(event.target.value)}
               />
-              <Button variant="primary" size="sm" type="submit">
+              {profileError && <p className="text-xs text-red-600">{profileError}</p>}
+              <Button variant="primary" size="sm" type="submit" isLoading={savingProfile}>
                 Save Changes
               </Button>
             </form>
@@ -166,36 +211,35 @@ export const ProfilePage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
                 <span className="text-stone-400 font-semibold block">Full Name</span>
-                <span className="font-bold text-stone-800 text-sm">{user.name}</span>
+                <span className="font-bold text-stone-800 text-sm">
+                  {user.name || 'Not set'}
+                </span>
               </div>
               <div>
                 <span className="text-stone-400 font-semibold block">Mobile Number</span>
-                <span className="font-mono font-bold text-stone-800 text-sm">+91 {user.phone}</span>
+                <span className="font-mono font-bold text-stone-800 text-sm">{user.phone}</span>
               </div>
               <div>
                 <span className="text-stone-400 font-semibold block">Email Address</span>
                 <span className="font-bold text-stone-800">{user.email || 'Not specified'}</span>
               </div>
               <div>
-                <span className="text-stone-400 font-semibold block">Account Status</span>
+                <span className="text-stone-400 font-semibold block">Verification</span>
                 <span className="text-emerald-700 font-bold inline-flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified Customer
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Mobile verified via OTP
                 </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Saved Addresses Section */}
         <div className="bg-white rounded-3xl border border-stone-200/90 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-stone-100">
             <div>
               <h3 className="font-bold text-sm text-[#4A2C17] font-heading uppercase tracking-wider">
-                Saved Delivery Addresses ({user.addresses.length})
+                Saved Delivery Addresses ({addresses.length})
               </h3>
-              <p className="text-xs text-stone-400">
-                Addresses used for morning milk and dairy drops.
-              </p>
+              <p className="text-xs text-stone-400">Used when you place an order.</p>
             </div>
             <Button
               variant="outline"
@@ -210,39 +254,43 @@ export const ProfilePage: React.FC = () => {
             </Button>
           </div>
 
-          {user.addresses.length > 0 ? (
+          {addressError && <p className="text-xs text-red-600">{addressError}</p>}
+
+          {addresses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {user.addresses.map((addr) => (
+              {addresses.map((address) => (
                 <div
-                  key={addr.id}
+                  key={address.id}
                   className="p-4 rounded-2xl border border-stone-200 flex flex-col justify-between gap-3 hover:border-amber-300 transition-colors"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-[#4A2C17]">{addr.name}</span>
+                      <span className="font-bold text-sm text-[#4A2C17]">{address.name}</span>
                       <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-stone-100 text-stone-700">
-                        {addr.type}
+                        {address.type}
                       </span>
                     </div>
                     <p className="text-xs text-stone-600 leading-relaxed">
-                      {addr.addressLine1}, {addr.addressLine2 ? `${addr.addressLine2}, ` : ''}
-                      {addr.city}, {addr.state} - {addr.pincode}
+                      {address.addressLine1}
+                      {address.addressLine2 ? `, ${address.addressLine2}` : ''}
+                      {address.landmark ? `, Near ${address.landmark}` : ''}, {address.city},{' '}
+                      {address.state} - {address.pincode}
                     </p>
-                    <p className="text-xs text-stone-500 font-mono">+91 {addr.phone}</p>
+                    <p className="text-xs text-stone-500 font-mono">{address.phone}</p>
                   </div>
 
                   <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                    {addr.isDefault ? (
+                    {address.isDefault ? (
                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Default Delivery Address
+                        Default address
                       </span>
                     ) : (
                       <button
                         type="button"
-                        onClick={() => setDefaultAddress(addr.id)}
+                        onClick={() => void setDefaultAddress(address.id)}
                         className="text-stone-500 hover:text-amber-700 font-semibold text-[11px]"
                       >
-                        Set as Default
+                        Set as default
                       </button>
                     )}
 
@@ -250,7 +298,7 @@ export const ProfilePage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setEditingAddress(addr);
+                          setEditingAddress(address);
                           setIsAddressModalOpen(true);
                         }}
                         className="p-1 text-stone-400 hover:text-stone-700"
@@ -258,10 +306,16 @@ export const ProfilePage: React.FC = () => {
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      {user.addresses.length > 1 && (
+                      {addresses.length > 1 && (
                         <button
                           type="button"
-                          onClick={() => deleteAddress(addr.id)}
+                          onClick={() =>
+                            void deleteAddress(address.id).catch((err) =>
+                              setAddressError(
+                                err instanceof Error ? err.message : 'Could not delete address.'
+                              )
+                            )
+                          }
                           className="p-1 text-stone-400 hover:text-red-600"
                           aria-label="Delete address"
                         >
@@ -278,7 +332,7 @@ export const ProfilePage: React.FC = () => {
               <MapPin className="w-8 h-8 text-stone-300 mx-auto mb-2" />
               <p className="text-xs font-bold text-stone-700">No saved delivery addresses</p>
               <p className="text-[11px] text-stone-400 mt-0.5 max-w-xs mx-auto">
-                Add an address to receive fresh farm milk, Bilona ghee, and chilled paneer.
+                Add an address so we know where to deliver your order.
               </p>
               <div className="mt-3">
                 <Button
@@ -290,7 +344,7 @@ export const ProfilePage: React.FC = () => {
                     setIsAddressModalOpen(true);
                   }}
                 >
-                  Add Your First Address
+                  Add your first address
                 </Button>
               </div>
             </div>
@@ -298,7 +352,6 @@ export const ProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Address Form Modal */}
       {isAddressModalOpen && (
         <AddressFormModal
           isOpen={isAddressModalOpen}

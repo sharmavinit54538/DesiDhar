@@ -14,6 +14,7 @@ interface ReviewStepProps {
   onEditStep: (step: 'ADDRESS' | 'SLOT' | 'PAYMENT') => void;
   onPlaceOrder: () => void;
   isPlacingOrder: boolean;
+  isPlaceOrderDisabled?: boolean;
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({
@@ -25,6 +26,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   onEditStep,
   onPlaceOrder,
   isPlacingOrder,
+  isPlaceOrderDisabled = false,
 }) => {
   return (
     <div className="bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-xs space-y-6">
@@ -84,7 +86,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               {slot.date} • {slot.timeWindow}
             </p>
             <p className="text-[10px] text-emerald-700 font-bold mt-1">
-              ❄️ 4°C Insulated Pack
+              Insulated packaging
             </p>
           </div>
         </div>
@@ -106,7 +108,9 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </div>
             <p className="font-bold text-xs text-[#4A2C17]">{paymentMethod}</p>
             <p className="text-[11px] text-stone-500">
-              {paymentMethod === 'COD' ? 'Cash / UPI at doorstep' : 'Prepaid (Simulated)'}
+              {paymentMethod === 'COD'
+                ? 'Pay in cash when the order arrives'
+                : 'You will complete the payment on the provider’s secure page'}
             </p>
             <p className="text-[11px] font-bold text-amber-900 mt-1">
               Total: {formatINR(pricing.total)}
@@ -127,6 +131,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <img
                   src={item.image}
                   alt={item.name}
+                  onError={(event) => {
+                    const target = event.currentTarget;
+                    if (target.dataset.hasError === 'true') return;
+                    target.dataset.hasError = 'true';
+                    target.src = '/images/placeholders/product-placeholder.svg';
+                  }}
                   className="w-12 h-12 object-cover rounded-lg border border-stone-200 shrink-0"
                 />
                 <div>
@@ -161,7 +171,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 text-xs text-stone-500">
           <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
-          <span>FSSAI certified dairy with 100% money-back freshness guarantee</span>
+          <span>Totals are recalculated by the server when the order is placed.</span>
         </div>
 
         <Button
@@ -169,6 +179,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           size="lg"
           className="w-full sm:w-auto px-8"
           isLoading={isPlacingOrder}
+          disabled={isPlaceOrderDisabled}
           onClick={onPlaceOrder}
         >
           Confirm &amp; Place Order ({formatINR(pricing.total)})

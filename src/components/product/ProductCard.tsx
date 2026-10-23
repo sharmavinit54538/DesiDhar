@@ -16,6 +16,7 @@ import {
   getPrimaryProductImage,
   getSecondaryProductImage,
   handleImageError,
+  isProductAssetVerified,
 } from '../../utils/imageResolver';
 
 interface ProductCardProps {
@@ -24,28 +25,33 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
-  // Active variant state (defaults to primary/first variant)
+  // The API returns variants ordered by the catalogue's sort order.
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const activeVariant = product.variants[selectedVariantIndex] || product.variants[0];
 
-  const primaryImage = getPrimaryProductImage(product, activeVariant.id);
+  const primaryImage = getPrimaryProductImage(product);
   const secondaryImage = getSecondaryProductImage(product);
 
   const { items, addItem, updateQuantity } = useCartStore();
-  const { isInWishlist, toggleWishlist } = useWishlistStore();
+  const { isInWishlist, toggle: toggleWishlist, status: wishlistStatus } = useWishlistStore();
   const { addToast } = useUiStore();
 
   const isWishlisted = isInWishlist(product.id);
 
-  // Check if active variant is already in cart
-  const cartItem = items.find((i) => i.variantId === activeVariant.id);
+  const cartItem = activeVariant
+    ? items.find((i) => i.variantId === activeVariant.id)
+    : undefined;
   const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  if (!activeVariant) {
+    return null;
+  }
 
   const discountPercent = calculateDiscountPercent(activeVariant.mrp, activeVariant.price);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleAddToCart = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     addItem({
       productId: product.id,
       variantId: activeVariant.id,
@@ -62,24 +68,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
     addToast(`Added ${product.name} (${activeVariant.weight}) to cart`, 'success');
   };
 
-  const handleIncrement = () => {
-    updateQuantity(activeVariant.id, quantityInCart + 1);
-  };
-
-  const handleDecrement = () => {
-    updateQuantity(activeVariant.id, quantityInCart - 1);
-  };
-
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWishlist(product);
-    addToast(
-      isWishlisted
-        ? `Removed ${product.name} from wishlist`
-        : `Added ${product.name} to wishlist`,
-      'info'
-    );
+  const handleWishlistToggle = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void toggleWishlist(product);
   };
 
   return (
@@ -97,7 +89,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
             srcSet={primaryImage.srcset}
             sizes={primaryImage.sizes}
             alt={primaryImage.alt}
-            onError={(e) => handleImageError(e, product.category)}
+            onError={(event) => handleImageError(event, product.category)}
             loading="lazy"
             className={cn(
               'w-full h-full object-cover transition-all duration-300',
@@ -110,7 +102,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
               srcSet={secondaryImage.srcset}
               sizes={secondaryImage.sizes}
               alt={secondaryImage.alt}
-              onError={(e) => handleImageError(e, product.category)}
+              onError={(event) => handleImageError(event, product.category)}
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             />
@@ -127,15 +119,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
             <Badge variant="fresh" size="sm">
               Fresh Today
             </Badge>
-          ) : product.isBestseller ? (
-            <Badge variant="bestseller" size="sm">
-              Bestseller
-            </Badge>
           ) : null}
 
           {discountPercent > 0 && (
             <span className="bg-red-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider shadow-xs">
               {discountPercent}% OFF
+            </span>
+          )}
+
+          {activeVariant.stock <= 0 && (
+            <span className="bg-stone-900/85 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider">
+              Out of stock
             </span>
           )}
         </div>
@@ -144,8 +138,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
         <button
           type="button"
           onClick={handleWishlistToggle}
+          disabled={wishlistStatus === 'loading'}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs shadow-xs flex items-center justify-center text-stone-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all z-10"
+          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs shadow-xs flex items-center justify-center text-stone-400 hover:text-red-500 hover:scale-110 active:scale-95 transition-all z-10 disabled:opacity-60"
         >
           <Heart
             className={cn(
@@ -155,16 +150,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
           />
         </button>
 
-        {/* 100% Veg Dot in bottom right corner of media */}
         <div className="absolute bottom-2 left-2 z-10">
           <VegBadge size="sm" />
         </div>
+
+        {!isProductAssetVerified(product) && (
+          <span className="absolute bottom-2 right-2 z-10 text-[9px] font-semibold text-stone-500 bg-white/90 rounded px-1.5 py-0.5">
+            Photo coming soon
+          </span>
+        )}
       </div>
 
       {/* Content Area */}
       <div className="p-3.5 flex flex-col flex-1 justify-between">
         <div>
-          {/* Brand & Rating Strip */}
           <div className="flex items-center justify-between text-xs mb-1">
             <span className="font-semibold text-stone-600 uppercase tracking-wider text-[10px]">
               {product.brand}
@@ -172,7 +171,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
             <RatingBadge rating={product.rating} reviewCount={product.reviewCount} showCount={false} />
           </div>
 
-          {/* Product Name */}
           <Link
             to={`/product/${product.slug}`}
             className="block text-sm font-bold text-[#4A2C17] hover:text-amber-700 line-clamp-2 leading-snug transition-colors min-h-[38px]"
@@ -181,21 +179,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
             {product.name}
           </Link>
 
-          {/* Variants Selector Strip (if product has multiple pack sizes) */}
           <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {product.variants.map((v, idx) => (
+            {product.variants.map((variant, index) => (
               <button
-                key={v.id}
+                key={variant.id}
                 type="button"
-                onClick={() => setSelectedVariantIndex(idx)}
+                onClick={() => setSelectedVariantIndex(index)}
                 className={cn(
                   'px-2 py-0.5 text-[11px] rounded-md font-semibold border transition-all whitespace-nowrap',
-                  selectedVariantIndex === idx
+                  selectedVariantIndex === index
                     ? 'bg-amber-100/80 border-amber-500 text-amber-950 shadow-2xs'
                     : 'bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-300'
                 )}
               >
-                {v.weight}
+                {variant.weight}
               </button>
             ))}
           </div>
@@ -203,7 +200,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
 
         {/* Pricing & Add to Cart button */}
         <div className="mt-2.5 sm:mt-3.5 pt-2.5 sm:pt-3 border-t border-stone-100 flex items-center justify-between gap-1 sm:gap-2">
-          {/* Price */}
           <div className="flex flex-col min-w-0">
             <div className="flex items-baseline gap-1 flex-wrap">
               <span className="text-sm sm:text-base font-extrabold text-[#4A2C17] whitespace-nowrap">
@@ -222,14 +218,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, className }) 
             )}
           </div>
 
-          {/* Quantity Stepper or Add button */}
           <div className="shrink-0">
             {quantityInCart > 0 ? (
               <QuantityStepper
                 quantity={quantityInCart}
                 max={activeVariant.stock}
-                onIncrement={handleIncrement}
-                onDecrement={handleDecrement}
+                onIncrement={() => updateQuantity(activeVariant.id, quantityInCart + 1)}
+                onDecrement={() => updateQuantity(activeVariant.id, quantityInCart - 1)}
                 size="sm"
                 showTrashOnOne
               />

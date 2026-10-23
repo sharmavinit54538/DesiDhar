@@ -1,645 +1,550 @@
 import type {
-  Product,
+  Address,
+  CartItem,
+  CartValidationResult,
   Category,
-  Review,
   Coupon,
-  PincodeCheckResult,
-  Order,
-  User,
+  DeliverySlot,
   FilterState,
-  HeroBanner
+  HeroBanner,
+  Order,
+  PaymentMethod,
+  PaymentMethodOption,
+  PincodeCheckResult,
+  Product,
+  ProductFacets,
+  PublicSettings,
+  Review,
+  ReviewSummary,
+  ServerProductList,
+  User,
 } from '../types';
-import { PRODUCTS as INITIAL_PRODUCTS } from '../data/products';
-import { CATEGORIES as INITIAL_CATEGORIES } from '../data/categories';
-import { HERO_BANNERS as INITIAL_BANNERS } from '../data/banners';
-import { MOCK_COUPONS } from '../data/coupons';
-import { SERVICEABLE_PINCODES } from '../data/pincodes';
-import { getProductImagesBySlug } from '../data/productImages';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-// Artificial delay helper to simulate real HTTP latency when in offline dynamic fallback mode
-const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Dynamic LocalStorage keys
-const STORAGE_KEYS = {
-  ORDERS: 'desidhar_orders',
-  REVIEWS: 'desidhar_reviews',
-  USERS: 'desidhar_users',
-  PRODUCTS: 'desidhar_dynamic_products',
-  CATEGORIES: 'desidhar_dynamic_categories',
-  BANNERS: 'desidhar_dynamic_banners',
-  INITIALIZED: 'desidhar_catalog_initialized',
-};
-
-// Generic fetch wrapper to call FastAPI backend
-async function fetchFromApi<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
-      ...options,
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      return null;
-    }
-    return (await res.json()) as T;
-  } catch {
-    // Backend is offline or not yet connected; fallback seamlessly
-    return null;
-  }
-}
-
-// Local dynamic repository helpers
-function getStoredItems<T>(key: string, defaultValue: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-}
-
-function saveStoredItems<T>(key: string, data: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    console.error(`Failed to save to localStorage (${key})`, e);
-  }
-}
-
-// Product image enrichment
-function enrichProductImages(product: Product): Product {
-  const richImages = getProductImagesBySlug(product.slug);
-  if (richImages.length > 0) {
-    return { ...product, images: richImages };
-  }
-  return product;
-}
-
-function enrichProductsWithImages(products: Product[]): Product[] {
-  return products.map(enrichProductImages);
-}
-
-// Dynamic catalog initialization: starts with catalog available in dynamic storage
-function getDynamicProducts(): Product[] {
-  const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
-  if (!isInitialized) {
-    // First time setup: populate dynamic storage from catalog
-    saveStoredItems(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
-    saveStoredItems(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-    saveStoredItems(STORAGE_KEYS.BANNERS, INITIAL_BANNERS);
-    localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
-    return INITIAL_PRODUCTS;
-  }
-  return getStoredItems<Product[]>(STORAGE_KEYS.PRODUCTS, []);
-}
-
-function getDynamicCategories(): Category[] {
-  const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
-  if (!isInitialized) {
-    getDynamicProducts(); // Triggers initialization
-  }
-  return getStoredItems<Category[]>(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-}
-
-function getDynamicBanners(): HeroBanner[] {
-  const isInitialized = localStorage.getItem(STORAGE_KEYS.INITIALIZED);
-  if (!isInitialized) {
-    getDynamicProducts(); // Triggers initialization
-  }
-  return getStoredItems<HeroBanner[]>(STORAGE_KEYS.BANNERS, INITIAL_BANNERS);
-}
+import { buildQuery, request } from './apiClient';
 
 /**
- * Dynamic API Service
- * Communicates with FastAPI REST API endpoints, with seamless dynamic database fallback
+ * Typed client for the DesiDhar API.
+ *
+ * Every method performs a real HTTP request. There are no local fallbacks, no
+ * seeded demo records and no simulated success paths: if the API fails, the
+ * error is surfaced to the caller so the UI can show an honest error state.
  */
+
+export interface ProductQuery extends Partial<Omit<FilterState, 'priceRange'>> {
+  page?: number;
+  pageSize?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  deal?: boolean;
+}
+
+export interface CartLineInput {
+  variantId: string;
+  quantity: number;
+}
+
+export interface AddressInput extends Omit<Address, 'id'> {
+  id?: string;
+}
+
+export interface OrderInput {
+  items: CartLineInput[];
+  addressId?: string;
+  address?: Omit<Address, 'id' | 'isDefault'> & { isDefault?: boolean };
+  slotId: string;
+  paymentMethod: PaymentMethod;
+  couponCode?: string;
+}
+
 export const api = {
-  // Clear entire product catalog to test empty state
-  clearCatalog(): void {
-    saveStoredItems(STORAGE_KEYS.PRODUCTS, []);
-    localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
+  /* Catalog */
+  async getSettings(): Promise<PublicSettings> {
+    return request<PublicSettings>('/settings');
   },
 
-  // Reset/seed sample dairy catalog into dynamic database
-  seedCatalog(): void {
-    saveStoredItems(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
-    saveStoredItems(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-    saveStoredItems(STORAGE_KEYS.BANNERS, INITIAL_BANNERS);
-    localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
-  },
-
-  // Check if database currently has no products
-  isCatalogEmpty(): boolean {
-    const products = getStoredItems<Product[]>(STORAGE_KEYS.PRODUCTS, []);
-    return products.length === 0;
-  },
-
-  // Products
-  async getProducts(filters?: Partial<FilterState>): Promise<{ products: Product[]; total: number }> {
-    // 1. Try FastAPI backend
-    const queryParams = new URLSearchParams();
-    if (filters?.category && filters.category !== 'all') queryParams.set('category', filters.category);
-    if (filters?.searchQuery) queryParams.set('q', filters.searchQuery);
-    if (filters?.sortBy) queryParams.set('sortBy', filters.sortBy);
-
-    const apiRes = await fetchFromApi<{ products: Product[]; total: number }>(`/products?${queryParams.toString()}`);
-    if (apiRes) {
-      return {
-        products: enrichProductsWithImages(apiRes.products),
-        total: apiRes.total,
-      };
-    }
-
-    // 2. Dynamic database fallback
-    await delay(180);
-    const stored = getDynamicProducts();
-    let result = enrichProductsWithImages([...stored]);
-
-    if (filters?.category && filters.category !== 'all') {
-      result = result.filter((p) => p.category.toLowerCase() === filters.category?.toLowerCase());
-    }
-
-    if (filters?.searchQuery && filters.searchQuery.trim() !== '') {
-      const q = filters.searchQuery.toLowerCase().trim();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q)) ||
-          p.shortDescription.toLowerCase().includes(q)
-      );
-    }
-
-    if (filters?.brands && filters.brands.length > 0) {
-      result = result.filter((p) => filters.brands?.includes(p.brand));
-    }
-
-    if (filters?.priceRange) {
-      const [min, max] = filters.priceRange;
-      result = result.filter((p) => {
-        const lowestPrice = Math.min(...p.variants.map((v) => v.price));
-        return lowestPrice >= min && lowestPrice <= max;
-      });
-    }
-
-    if (filters?.minRating && filters.minRating > 0) {
-      result = result.filter((p) => p.rating >= filters.minRating!);
-    }
-
-    if (filters?.minDiscount && filters.minDiscount > 0) {
-      result = result.filter((p) => {
-        const maxDiscount = Math.max(
-          ...p.variants.map((v) => Math.round(((v.mrp - v.price) / v.mrp) * 100))
-        );
-        return maxDiscount >= filters.minDiscount!;
-      });
-    }
-
-    if (filters?.dietary && filters.dietary.length > 0) {
-      result = result.filter((p) =>
-        filters.dietary?.some((tag) =>
-          p.tags.some((t) => t.toLowerCase().includes(tag.toLowerCase()))
-        )
-      );
-    }
-
-    if (filters?.inStockOnly) {
-      result = result.filter((p) => p.variants.some((v) => v.stock > 0));
-    }
-
-    // Sorting
-    if (filters?.sortBy) {
-      switch (filters.sortBy) {
-        case 'price-asc':
-          result.sort((a, b) => a.variants[0].price - b.variants[0].price);
-          break;
-        case 'price-desc':
-          result.sort((a, b) => b.variants[0].price - a.variants[0].price);
-          break;
-        case 'rating':
-          result.sort((a, b) => b.rating - a.rating);
-          break;
-        case 'discount':
-          result.sort((a, b) => {
-            const discA = (a.variants[0].mrp - a.variants[0].price) / a.variants[0].mrp;
-            const discB = (b.variants[0].mrp - b.variants[0].price) / b.variants[0].mrp;
-            return discB - discA;
-          });
-          break;
-        case 'newest':
-          result.reverse();
-          break;
-        case 'relevance':
-        default:
-          result.sort((a, b) => (b.isBestseller ? 1 : 0) - (a.isBestseller ? 1 : 0));
-          break;
-      }
-    }
-
-    return { products: result, total: result.length };
-  },
-
-  async getProductBySlug(slug: string): Promise<Product | null> {
-    const apiRes = await fetchFromApi<Product>(`/products/${slug}`);
-    if (apiRes) return enrichProductImages(apiRes);
-
-    await delay(120);
-    const stored = getDynamicProducts();
-    const product = stored.find((p) => p.slug === slug);
-    return product ? enrichProductImages(product) : null;
-  },
-
-  async getProductById(id: string): Promise<Product | null> {
-    const apiRes = await fetchFromApi<Product>(`/products/id/${id}`);
-    if (apiRes) return enrichProductImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    const product = stored.find((p) => p.id === id);
-    return product ? enrichProductImages(product) : null;
-  },
-
-  async getRelatedProducts(productId: string, category: string, limit = 4): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>(`/products/related?productId=${productId}&category=${category}&limit=${limit}`);
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(150);
-    const stored = getDynamicProducts();
-    return enrichProductsWithImages(
-      stored
-        .filter((p) => p.category === category && p.id !== productId)
-        .slice(0, limit)
-    );
-  },
-
-  async getFrequentlyBoughtTogether(product: Product): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>(`/products/frequently-bought?productId=${product.id}`);
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    const complementCategories = ['curd-dahi', 'paneer', 'butter', 'milk', 'mithai'];
-    return enrichProductsWithImages(
-      stored
-        .filter((p) => p.id !== product.id && complementCategories.includes(p.category))
-        .slice(0, 2)
-    );
-  },
-
-  // Home curated sections
-  async getDealOfTheDay(): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>('/products/deals');
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    return enrichProductsWithImages(
-      stored.filter((p) => p.isDeal || p.tags.includes('Deal of Day')).slice(0, 6)
-    );
-  },
-
-  async getBestSellers(): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>('/products/bestsellers');
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    return enrichProductsWithImages(
-      stored.filter((p) => p.isBestseller).slice(0, 8)
-    );
-  },
-
-  async getFreshToday(): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>('/products/fresh');
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    return enrichProductsWithImages(
-      stored.filter((p) => p.isFresh || p.tags.includes('Fresh Today')).slice(0, 8)
-    );
-  },
-
-  async getFestiveSweets(): Promise<Product[]> {
-    const apiRes = await fetchFromApi<Product[]>('/products/sweets');
-    if (apiRes) return enrichProductsWithImages(apiRes);
-
-    await delay(100);
-    const stored = getDynamicProducts();
-    return enrichProductsWithImages(
-      stored.filter((p) => p.category === 'mithai' || p.category === 'gift-boxes').slice(0, 8)
-    );
-  },
-
-  // Categories
   async getCategories(): Promise<Category[]> {
-    const apiRes = await fetchFromApi<Category[]>('/categories');
-    if (apiRes) return apiRes;
-
-    await delay(80);
-    return getDynamicCategories();
+    const { categories } = await request<{ categories: Category[] }>('/categories');
+    return categories;
   },
 
   async getCategoryBySlug(slug: string): Promise<Category | null> {
-    const apiRes = await fetchFromApi<Category>(`/categories/${slug}`);
-    if (apiRes) return apiRes;
-
-    await delay(80);
-    const categories = getDynamicCategories();
-    return categories.find((c) => c.slug === slug) || null;
+    try {
+      const { category } = await request<{ category: Category }>(`/categories/${encodeURIComponent(slug)}`);
+      return category;
+    } catch {
+      return null;
+    }
   },
 
-  // Banners
   async getBanners(): Promise<HeroBanner[]> {
-    const apiRes = await fetchFromApi<HeroBanner[]>('/banners');
-    if (apiRes) return apiRes;
-
-    await delay(50);
-    return getDynamicBanners();
+    const { banners } = await request<{ banners: HeroBanner[] }>('/banners');
+    return banners;
   },
 
-  // Pincode
-  async checkPincode(pincode: string): Promise<PincodeCheckResult> {
-    const apiRes = await fetchFromApi<PincodeCheckResult>(`/pincodes/${pincode.trim()}`);
-    if (apiRes) return apiRes;
-
-    await delay(250);
-    const cleaned = pincode.trim();
-    if (SERVICEABLE_PINCODES[cleaned]) {
-      return SERVICEABLE_PINCODES[cleaned];
-    }
-    if (/^[1-9][0-9]{5}$/.test(cleaned)) {
-      return {
-        pincode: cleaned,
-        isServiceable: true,
-        estimatedDelivery: '2 Business Days via Standard Cold Cargo',
-        coldChainAvailable: false,
-        city: 'Serviceable Area',
-        message: 'Standard delivery available for shelf-stable items (Ghee, Sweets).'
-      };
-    }
-    return {
-      pincode: cleaned,
-      isServiceable: false,
-      estimatedDelivery: 'Unavailable',
-      coldChainAvailable: false,
-      city: 'Unknown',
-      message: 'Sorry! DesiDhar cold-chain is currently not serviceable at this pincode.'
-    };
-  },
-
-  // Coupons
-  async validateCoupon(code: string, cartTotal: number): Promise<{ isValid: boolean; coupon?: Coupon; error?: string }> {
-    const apiRes = await fetchFromApi<{ isValid: boolean; coupon?: Coupon; error?: string }>('/coupons/validate', {
-      method: 'POST',
-      body: JSON.stringify({ code, cartTotal }),
+  async getProducts(query: ProductQuery = {}): Promise<ServerProductList> {
+    const params = buildQuery({
+      category: query.category && query.category !== 'all' ? query.category : undefined,
+      q: query.searchQuery,
+      sortBy: query.sortBy,
+      brands: query.brands && query.brands.length > 0 ? query.brands.join(',') : undefined,
+      weights: query.weights && query.weights.length > 0 ? query.weights.join(',') : undefined,
+      dietary: query.dietary && query.dietary.length > 0 ? query.dietary.join(',') : undefined,
+      minPrice: query.minPrice,
+      maxPrice: query.maxPrice,
+      minRating: query.minRating || undefined,
+      minDiscount: query.minDiscount || undefined,
+      inStock: query.inStockOnly || undefined,
+      deal: query.deal || undefined,
+      page: query.page,
+      pageSize: query.pageSize,
     });
-    if (apiRes) return apiRes;
-
-    await delay(200);
-    const upper = code.trim().toUpperCase();
-    const coupon = MOCK_COUPONS.find((c) => c.code === upper);
-
-    if (!coupon) {
-      return { isValid: false, error: 'Invalid coupon code. Try DESI10, FIRSTORDER, or FESTIVE20' };
-    }
-
-    if (cartTotal < coupon.minOrderValue) {
-      return {
-        isValid: false,
-        error: `Cart total must be at least ₹${coupon.minOrderValue} to apply code ${coupon.code}`
-      };
-    }
-
-    return { isValid: true, coupon };
+    return request<ServerProductList>(`/products${params}`);
   },
 
-  // Reviews: NO hardcoded fake reviews! Starts empty and accumulates real customer reviews.
-  async getReviews(productId?: string): Promise<Review[]> {
-    if (productId) {
-      const apiRes = await fetchFromApi<Review[]>(`/reviews/${productId}`);
-      if (apiRes) return apiRes;
+  async getFacets(): Promise<ProductFacets> {
+    const { facets } = await request<{ facets: ProductFacets }>('/products/facets');
+    return facets;
+  },
+
+  async getProductBySlug(slug: string): Promise<Product | null> {
+    try {
+      const { product } = await request<{ product: Product }>(
+        `/products/${encodeURIComponent(slug)}`
+      );
+      return product;
+    } catch (error) {
+      if ((error as { status?: number }).status === 404) return null;
+      throw error;
     }
-
-    await delay(100);
-    const stored = getStoredItems<Review[]>(STORAGE_KEYS.REVIEWS, []);
-    if (!productId) {
-      return stored;
-    }
-    return stored.filter((r) => r.productId === productId);
   },
 
-  async getFeaturedReviews(): Promise<Review[]> {
-    const apiRes = await fetchFromApi<Review[]>('/reviews/featured');
-    if (apiRes) return apiRes;
-
-    await delay(100);
-    const stored = getStoredItems<Review[]>(STORAGE_KEYS.REVIEWS, []);
-    return stored.slice(0, 3);
+  async getRelatedProducts(slug: string, limit = 4): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>(
+      `/products/${encodeURIComponent(slug)}/related${buildQuery({ limit })}`
+    );
+    return products;
   },
 
-  async addReview(reviewData: Omit<Review, 'id' | 'date'>): Promise<Review> {
-    const apiRes = await fetchFromApi<Review>('/reviews', {
-      method: 'POST',
-      body: JSON.stringify(reviewData),
-    });
-    if (apiRes) return apiRes;
-
-    await delay(250);
-    const newReview: Review = {
-      ...reviewData,
-      id: `rev-user-${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-      helpfulCount: 0
-    };
-    const stored = getStoredItems<Review[]>(STORAGE_KEYS.REVIEWS, []);
-    saveStoredItems(STORAGE_KEYS.REVIEWS, [newReview, ...stored]);
-    return newReview;
+  async getFrequentlyBought(slug: string, limit = 2): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>(
+      `/products/${encodeURIComponent(slug)}/frequently-bought${buildQuery({ limit })}`
+    );
+    return products;
   },
 
-  // Search suggestions
+  async getDeals(): Promise<{ products: Product[]; endsAt: string | null }> {
+    return request<{ products: Product[]; endsAt: string | null }>('/products/deals');
+  },
+
+  async getFeatured(): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/products/featured');
+    return products;
+  },
+
+  async getFreshToday(): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/products/fresh');
+    return products;
+  },
+
+  async getFestiveSweets(): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/products/sweets');
+    return products;
+  },
+
   async searchSuggestions(query: string): Promise<{ products: Product[]; categories: Category[] }> {
-    const apiRes = await fetchFromApi<{ products: Product[]; categories: Category[] }>(`/search/suggestions?q=${encodeURIComponent(query)}`);
-    if (apiRes) return apiRes;
-
-    await delay(100);
-    const q = query.toLowerCase().trim();
-    if (!q) return { products: [], categories: [] };
-
-    const categories = getDynamicCategories();
-    const products = getDynamicProducts();
-
-    const matchingCategories = categories.filter((c) =>
-      c.name.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q)
-    ).slice(0, 3);
-
-    const matchingProducts = products.filter((p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      p.tags.some((t) => t.toLowerCase().includes(q))
-    ).slice(0, 6);
-
-    return { products: matchingProducts, categories: matchingCategories };
+    return request<{ products: Product[]; categories: Category[] }>(
+      `/search/suggestions${buildQuery({ q: query })}`
+    );
   },
 
-  // Auth: Dynamic phone auth with NO hardcoded fake user name, fake email, or fake address!
-  async sendOtp(phone: string): Promise<{ success: boolean; message: string }> {
-    const apiRes = await fetchFromApi<{ success: boolean; message: string }>('/auth/send-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phone }),
-    });
-    if (apiRes) return apiRes;
+  async getTrendingProducts(limit = 5): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>(
+      `/search/trending${buildQuery({ limit })}`
+    );
+    return products;
+  },
 
-    await delay(300);
-    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
-      return { success: false, message: 'Please enter a valid 10-digit Indian mobile number.' };
-    }
+  /* Delivery */
+  async checkPincode(pincode: string): Promise<PincodeCheckResult> {
+    return request<PincodeCheckResult>(`/pincodes/${encodeURIComponent(pincode.trim())}`);
+  },
+
+  async getPopularPincodes(): Promise<{ pincode: string; city: string }[]> {
+    const { pincodes } = await request<{ pincodes: { pincode: string; city: string }[] }>(
+      '/pincodes/popular'
+    );
+    return pincodes;
+  },
+
+  async getDeliverySlots(): Promise<DeliverySlot[]> {
+    const { slots } = await request<{ slots: DeliverySlot[] }>('/delivery-slots');
+    return slots;
+  },
+
+  async getPaymentMethods(): Promise<PaymentMethodOption[]> {
+    const { methods } = await request<{ methods: PaymentMethodOption[] }>('/payment-methods');
+    return methods;
+  },
+
+  /* Coupons */
+  async getPublicCoupons(): Promise<Coupon[]> {
+    const { coupons } = await request<{ coupons: Coupon[] }>('/coupons');
+    return coupons;
+  },
+
+  async validateCoupon(
+    code: string,
+    cartTotal: number
+  ): Promise<{ isValid: boolean; coupon?: Coupon; error?: string }> {
+    return request<{ isValid: boolean; coupon?: Coupon; error?: string }>('/coupons/validate', {
+      method: 'POST',
+      body: { code, cartTotal },
+    });
+  },
+
+  /**
+   * POST /api/cart/validate returns authoritative prices, stock and coupon math.
+   * The server reports the sellable quantity as `stock`, which is mapped onto the
+   * client-side `maxStock` field so the cart UI can clamp quantity steppers.
+   */
+  async validateCart(items: CartLineInput[], couponCode?: string): Promise<CartValidationResult> {
+    const result = await request<
+      Omit<CartValidationResult, 'items'> & {
+        items: (Omit<CartItem, 'maxStock'> & { stock: number })[];
+      }
+    >('/cart/validate', {
+      method: 'POST',
+      body: { items, couponCode },
+    });
+
     return {
-      success: true,
-      message: 'OTP sent successfully! (Demo mode: enter any 6 digits to login)'
+      ...result,
+      items: (result.items || []).map((line) => {
+        const { stock, ...rest } = line;
+        return { ...rest, maxStock: stock };
+      }),
     };
   },
 
-  async verifyOtp(phone: string, otp: string): Promise<{ success: boolean; user?: User; error?: string }> {
-    const apiRes = await fetchFromApi<{ success: boolean; user?: User; error?: string }>('/auth/verify-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phone, otp }),
-    });
-    if (apiRes) return apiRes;
-
-    await delay(350);
-    if (!/^\d{6}$/.test(otp.trim())) {
-      return { success: false, error: 'Please enter a valid 6-digit OTP.' };
-    }
-
-    const cleanPhone = phone.trim();
-    const storedUsers = getStoredItems<Record<string, User>>(STORAGE_KEYS.USERS, {});
-
-    // If user already exists in storage for this phone, return their actual saved profile
-    if (storedUsers[cleanPhone]) {
-      return { success: true, user: storedUsers[cleanPhone] };
-    }
-
-    // Otherwise create a fresh user with empty profile and NO hardcoded addresses
-    const freshUser: User = {
-      id: `user-${cleanPhone}`,
-      name: `User ${cleanPhone.slice(-4)}`,
-      phone: cleanPhone,
-      email: '',
-      addresses: [],
-      isLoggedIn: true
-    };
-
-    storedUsers[cleanPhone] = freshUser;
-    saveStoredItems(STORAGE_KEYS.USERS, storedUsers);
-
-    return { success: true, user: freshUser };
+  /* Reviews */
+  async getReviews(productId: string): Promise<{ reviews: Review[]; summary: ReviewSummary }> {
+    return request<{ reviews: Review[]; summary: ReviewSummary }>(
+      `/reviews/${encodeURIComponent(productId)}`
+    );
   },
 
-  // Orders: Dynamic order storage; starts empty and stores real user orders
-  async createOrder(orderPayload: Omit<Order, 'id' | 'orderNumber' | 'createdAt' | 'trackingNumber'>): Promise<Order> {
-    const apiRes = await fetchFromApi<Order>('/orders', {
+  async getFeaturedReviews(limit = 3): Promise<Review[]> {
+    const { reviews } = await request<{ reviews: Review[] }>(
+      `/reviews/featured${buildQuery({ limit })}`
+    );
+    return reviews;
+  },
+
+  async addReview(payload: { productId: string; rating: number; comment: string }): Promise<Review> {
+    const { review } = await request<{ review: Review }>('/reviews', {
       method: 'POST',
-      body: JSON.stringify(orderPayload),
+      body: payload,
     });
-    if (apiRes) return apiRes;
+    return review;
+  },
 
-    await delay(400);
-    const orderId = `DD-${Date.now().toString().slice(-6)}`;
-    const trackingNumber = `TRACK-DD-${Math.floor(100000 + Math.random() * 900000)}`;
+  /* Auth */
+  async sendOtp(
+    phone: string
+  ): Promise<{ success: boolean; message: string; devMode?: boolean; devCode?: string }> {
+    return request('/auth/send-otp', { method: 'POST', body: { phone } });
+  },
 
-    const newOrder: Order = {
-      ...orderPayload,
-      id: orderId,
-      orderNumber: orderId,
-      createdAt: new Date().toISOString(),
-      trackingNumber,
-      timeline: [
-        {
-          status: 'PLACED',
-          title: 'Order Placed & Confirmed',
-          time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-          done: true,
-          description: 'Your pure dairy order is confirmed and scheduled for farm packing.'
-        },
-        {
-          status: 'PACKED',
-          title: 'Packed in Cold-Chain Insulated Box',
-          time: 'Scheduled: 4:00 AM',
-          done: false,
-          description: 'Packed at 2°C with gel ice packs.'
-        },
-        {
-          status: 'OUT_FOR_DELIVERY',
-          title: 'Out for Morning Delivery',
-          time: 'Scheduled: 6:00 AM',
-          done: false,
-          description: 'DesiDhar refrigerated electric van en route.'
-        },
-        {
-          status: 'DELIVERED',
-          title: 'Delivered at Doorstep',
-          time: 'Estimated before 7:30 AM',
-          done: false,
-          description: 'Fresh milk and sweets delivered.'
-        }
-      ]
-    };
+  async verifyOtp(phone: string, otp: string): Promise<{ success: boolean; user: User }> {
+    const result = await request<{ success: boolean; user: User; token: string }>('/auth/verify-otp', {
+      method: 'POST',
+      body: { phone, otp },
+    });
+    return { success: result.success, user: result.user };
+  },
 
-    const existing = getStoredItems<Order[]>(STORAGE_KEYS.ORDERS, []);
-    saveStoredItems(STORAGE_KEYS.ORDERS, [newOrder, ...existing]);
-    return newOrder;
+  async logout(): Promise<void> {
+    await request('/auth/logout', { method: 'POST' });
+  },
+
+  async getSession(): Promise<{ user: User | null; addresses: Address[] }> {
+    return request<{ user: User | null; addresses?: Address[] }>('/auth/me').then((result) => ({
+      user: result.user,
+      addresses: result.addresses || [],
+    }));
+  },
+
+  async updateProfile(payload: { name?: string; email?: string }): Promise<User> {
+    const { user } = await request<{ user: User }>('/auth/me', {
+      method: 'PATCH',
+      body: payload,
+    });
+    return user;
+  },
+
+  /* Addresses */
+  async getAddresses(): Promise<Address[]> {
+    const { addresses } = await request<{ addresses: Address[] }>('/addresses');
+    return addresses;
+  },
+
+  async addAddress(payload: AddressInput): Promise<Address[]> {
+    const { addresses } = await request<{ addresses: Address[] }>('/addresses', {
+      method: 'POST',
+      body: payload,
+    });
+    return addresses;
+  },
+
+  async updateAddress(id: string, payload: AddressInput): Promise<Address[]> {
+    const { addresses } = await request<{ addresses: Address[] }>(`/addresses/${id}`, {
+      method: 'PATCH',
+      body: payload,
+    });
+    return addresses;
+  },
+
+  async deleteAddress(id: string): Promise<Address[]> {
+    const { addresses } = await request<{ addresses: Address[] }>(`/addresses/${id}`, {
+      method: 'DELETE',
+    });
+    return addresses;
+  },
+
+  async setDefaultAddress(id: string): Promise<Address[]> {
+    const { addresses } = await request<{ addresses: Address[] }>(`/addresses/${id}/default`, {
+      method: 'POST',
+    });
+    return addresses;
+  },
+
+  /* Wishlist */
+  async getWishlist(): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/wishlist');
+    return products;
+  },
+
+  async addToWishlist(productId: string): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/wishlist', {
+      method: 'POST',
+      body: { productId },
+    });
+    return products;
+  },
+
+  async removeFromWishlist(productId: string): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>(
+      `/wishlist/${encodeURIComponent(productId)}`,
+      { method: 'DELETE' }
+    );
+    return products;
+  },
+
+  async clearWishlist(): Promise<Product[]> {
+    const { products } = await request<{ products: Product[] }>('/wishlist', { method: 'DELETE' });
+    return products;
+  },
+
+  /* Orders */
+  async createOrder(payload: OrderInput): Promise<Order> {
+    const { order } = await request<{ order: Order }>('/orders', {
+      method: 'POST',
+      body: payload,
+    });
+    return order;
   },
 
   async getOrders(): Promise<Order[]> {
-    const apiRes = await fetchFromApi<Order[]>('/orders');
-    if (apiRes) return apiRes;
-
-    await delay(150);
-    return getStoredItems<Order[]>(STORAGE_KEYS.ORDERS, []);
+    const { orders } = await request<{ orders: Order[] }>('/orders');
+    return orders;
   },
 
   async getOrderById(orderId: string): Promise<Order | null> {
-    const apiRes = await fetchFromApi<Order>(`/orders/${orderId}`);
-    if (apiRes) return apiRes;
-
-    await delay(150);
-    const orders = getStoredItems<Order[]>(STORAGE_KEYS.ORDERS, []);
-    return orders.find((o) => o.id === orderId || o.orderNumber === orderId) || null;
+    try {
+      const { order } = await request<{ order: Order }>(`/orders/${encodeURIComponent(orderId)}`);
+      return order;
+    } catch (error) {
+      if ((error as { status?: number }).status === 404) return null;
+      throw error;
+    }
   },
 
-  async cancelOrder(orderId: string): Promise<Order | null> {
-    const apiRes = await fetchFromApi<Order>(`/orders/${orderId}/cancel`, { method: 'POST' });
-    if (apiRes) return apiRes;
+  async cancelOrder(orderId: string): Promise<Order> {
+    const { order } = await request<{ order: Order }>(
+      `/orders/${encodeURIComponent(orderId)}/cancel`,
+      { method: 'POST' }
+    );
+    return order;
+  },
 
-    await delay(200);
-    const orders = getStoredItems<Order[]>(STORAGE_KEYS.ORDERS, []);
-    const idx = orders.findIndex((o) => o.id === orderId);
-    if (idx !== -1) {
-      orders[idx].status = 'CANCELLED';
-      orders[idx].timeline.push({
-        status: 'CANCELLED',
-        title: 'Order Cancelled',
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-        done: true,
-        description: 'Order cancelled by customer. Refund initiated if prepaid.'
-      });
-      saveStoredItems(STORAGE_KEYS.ORDERS, [...orders]);
-      return orders[idx];
-    }
-    return null;
-  }
+  /* Payments */
+  async createRazorpayOrder(orderId: string) {
+    return request<{
+      provider: string;
+      keyId: string;
+      razorpayOrderId: string;
+      amount: number;
+      currency: string;
+      orderNumber: string;
+    }>('/payments/razorpay/order', { method: 'POST', body: { orderId } });
+  },
+
+  async verifyRazorpayPayment(payload: {
+    orderId: string;
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+  }): Promise<Order> {
+    const { order } = await request<{ order: Order }>('/payments/razorpay/verify', {
+      method: 'POST',
+      body: payload,
+    });
+    return order;
+  },
+
+  /* Support */
+  async submitContact(payload: {
+    name: string;
+    email?: string;
+    phone: string;
+    subject?: string;
+    message: string;
+  }): Promise<{ id: string; receivedAt: string }> {
+    return request('/contact', { method: 'POST', body: payload });
+  },
+
+  async subscribeNewsletter(email: string): Promise<{ email: string; subscribedAt?: string }> {
+    return request('/newsletter', { method: 'POST', body: { email } });
+  },
+
+  /* Admin */
+  async adminGetStats() {
+    const { stats } = await request<{ stats: import('../types/admin').AdminStats }>('/admin/stats');
+    return stats;
+  },
+
+  async adminGetOverview() {
+    return request<Record<string, unknown>>('/admin/overview');
+  },
+
+  async adminDeleteProductImage(productId: string, imageId: string) {
+    return request(`/admin/products/${encodeURIComponent(productId)}/images/${encodeURIComponent(imageId)}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async adminGetProducts(params: { q?: string; lowStock?: boolean } = {}) {
+    const { products } = await request<{ products: import('../types/admin').AdminProduct[] }>(
+      `/admin/products${buildQuery({ q: params.q, lowStock: params.lowStock })}`
+    );
+    return products;
+  },
+
+  async adminUpdateVariant(
+    productId: string,
+    variantId: string,
+    payload: { stock?: number; price?: number; mrp?: number }
+  ) {
+    const { variant } = await request<{ variant: import('../types/admin').AdminVariantUpdate }>(
+      `/admin/products/${encodeURIComponent(productId)}/variants/${encodeURIComponent(variantId)}`,
+      { method: 'PATCH', body: payload }
+    );
+    return variant;
+  },
+
+  async adminUpdateProduct(
+    productId: string,
+    payload: Partial<{
+      isActive: boolean;
+      isFeatured: boolean;
+      isFresh: boolean;
+      isDeal: boolean;
+      dealEndsAt: string | null;
+    }>
+  ) {
+    return request(`/admin/products/${encodeURIComponent(productId)}`, {
+      method: 'PATCH',
+      body: payload,
+    });
+  },
+
+  async adminGetOrders(status?: string) {
+    const { orders } = await request<{ orders: import('../types/admin').AdminOrder[] }>(
+      `/admin/orders${buildQuery({ status })}`
+    );
+    return orders;
+  },
+
+  async adminUpdateOrder(
+    orderId: string,
+    payload: { status: string; trackingNumber?: string | null; courierName?: string | null }
+  ) {
+    const { order } = await request<{ order: Order }>(
+      `/admin/orders/${encodeURIComponent(orderId)}`,
+      { method: 'PATCH', body: payload }
+    );
+    return order;
+  },
+
+  async adminGetCoupons() {
+    return (await request<{ coupons: import('../types/admin').AdminCoupon[] }>('/admin/coupons'))
+      .coupons;
+  },
+
+  async adminSaveCoupon(payload: Record<string, unknown>) {
+    const { coupon } = await request<{ coupon: import('../types/admin').AdminCoupon }>(
+      '/admin/coupons',
+      { method: 'POST', body: payload }
+    );
+    return coupon;
+  },
+
+  async adminToggleCoupon(code: string, isActive: boolean) {
+    const { coupon } = await request<{ coupon: import('../types/admin').AdminCoupon }>(
+      `/admin/coupons/${encodeURIComponent(code)}`,
+      { method: 'PATCH', body: { isActive } }
+    );
+    return coupon;
+  },
+
+  async adminGetReviews(status?: string) {
+    return (
+      await request<{ reviews: import('../types/admin').AdminReview[] }>(
+        `/admin/reviews${buildQuery({ status })}`
+      )
+    ).reviews;
+  },
+
+  async adminModerateReview(reviewId: string, status: 'published' | 'pending' | 'hidden') {
+    return request(`/admin/reviews/${encodeURIComponent(reviewId)}`, {
+      method: 'PATCH',
+      body: { status },
+    });
+  },
+
+  async adminGetMessages() {
+    return (
+      await request<{ messages: import('../types/admin').AdminMessage[] }>('/admin/messages')
+    ).messages;
+  },
+
+  async adminResolveMessage(messageId: string) {
+    return request(`/admin/messages/${encodeURIComponent(messageId)}`, { method: 'PATCH' });
+  },
+
+  async adminGetSettings() {
+    return request<{ settings: Record<string, string>; publicSettings: PublicSettings }>(
+      '/admin/settings'
+    );
+  },
+
+  async adminUpdateSettings(payload: Record<string, string>) {
+    const { settings } = await request<{ settings: Record<string, string> }>('/admin/settings', {
+      method: 'PATCH',
+      body: payload,
+    });
+    return settings;
+  },
 };
+
+export type ApiClient = typeof api;
+export type { CartItem, Order, Product, User };

@@ -10,6 +10,7 @@ import { OrderTimeline } from '../components/order/OrderTimeline';
 import { Button } from '../components/common/Button';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Skeleton } from '../components/common/Skeleton';
+import { ErrorState } from '../components/common/ErrorState';
 import { VegBadge } from '../components/common/VegBadge';
 import {
   MapPin,
@@ -27,6 +28,7 @@ export const OrderDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const { addItem } = useCartStore();
   const { addToast } = useUiStore();
@@ -34,18 +36,21 @@ export const OrderDetailPage: React.FC = () => {
   const fetchOrder = async () => {
     if (!orderId) return;
     setLoading(true);
+    setError(null);
     try {
       const found = await api.getOrderById(orderId);
       setOrder(found);
-    } catch (e) {
-      console.error(e);
+      if (!found) setError('NOT_FOUND');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'This order could not be loaded.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrder();
+    void fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
   const handleReorder = () => {
@@ -102,11 +107,13 @@ export const OrderDetailPage: React.FC = () => {
     );
   }
 
-  if (!order) {
+  if (error === 'NOT_FOUND') {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         <h2 className="text-2xl font-bold font-heading mb-2">Order Not Found</h2>
-        <p className="text-stone-500 mb-6">Could not find order #{orderId}.</p>
+        <p className="text-stone-500 mb-6">
+          We could not find an order with reference {orderId} under your account.
+        </p>
         <Link to="/account/orders">
           <Button variant="primary">Back to Orders</Button>
         </Link>
@@ -114,7 +121,19 @@ export const OrderDetailPage: React.FC = () => {
     );
   }
 
-  const isPlaced = order.status === 'PLACED';
+  if (!order) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        <ErrorState
+          title="Order could not be loaded"
+          message={error || 'Unknown error.'}
+          onRetry={() => void fetchOrder()}
+        />
+      </div>
+    );
+  }
+
+  const isPlaced = ['PLACED', 'PENDING_PAYMENT', 'PACKED'].includes(order.status);
 
   return (
     <>
@@ -136,14 +155,22 @@ export const OrderDetailPage: React.FC = () => {
                 className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md border ${
                   order.status === 'CANCELLED'
                     ? 'bg-red-100 text-red-900 border-red-300'
-                    : 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                    : order.status === 'DELIVERED'
+                    ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                    : 'bg-amber-100 text-amber-900 border-amber-300'
                 }`}
               >
-                {order.status}
+                {order.status.replace(/_/g, ' ')}
+              </span>
+              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border border-stone-300 bg-stone-100 text-stone-700">
+                {order.paymentStatus}
               </span>
             </div>
             <p className="text-xs text-stone-500 mt-0.5">
-              Placed on {formatDateTime(order.createdAt)} • Tracking ID: <span className="font-mono text-stone-700">{order.trackingNumber}</span>
+              Placed on {formatDateTime(order.createdAt)} • Tracking:{' '}
+              <span className="font-mono text-stone-700">
+                {order.trackingNumber || 'not assigned yet'}
+              </span>
             </p>
           </div>
 
@@ -188,6 +215,12 @@ export const OrderDetailPage: React.FC = () => {
                     <img
                       src={item.image}
                       alt={item.name}
+                      onError={(event) => {
+                        const target = event.currentTarget;
+                        if (target.dataset.hasError === 'true') return;
+                        target.dataset.hasError = 'true';
+                        target.src = '/images/placeholders/product-placeholder.svg';
+                      }}
                       className="w-14 h-14 object-cover rounded-xl border border-stone-200 shrink-0"
                     />
                     <div>
@@ -271,7 +304,7 @@ export const OrderDetailPage: React.FC = () => {
                 </span>
               </div>
               <div className="pt-2 border-t border-dashed border-stone-200 flex justify-between items-baseline font-bold">
-                <span className="text-sm text-[#4A2C17]">Paid Amount</span>
+                <span className="text-sm text-[#4A2C17]">Order Total</span>
                 <span className="text-lg font-black text-[#4A2C17] font-mono">
                   {formatINR(order.pricing.total)}
                 </span>

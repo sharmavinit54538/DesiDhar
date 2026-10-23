@@ -25,7 +25,7 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 interface AddressFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (address: Omit<Address, 'id'>) => void;
+  onSave: (address: Omit<Address, 'id'>) => void | Promise<void>;
   initialData?: Address | null;
 }
 
@@ -46,12 +46,12 @@ export const AddressFormModal: React.FC<AddressFormModalProps> = ({
     defaultValues: {
       name: initialData?.name || '',
       phone: initialData?.phone || '',
-      pincode: initialData?.pincode || '110001',
+      pincode: initialData?.pincode || '',
       addressLine1: initialData?.addressLine1 || '',
       addressLine2: initialData?.addressLine2 || '',
       landmark: initialData?.landmark || '',
-      city: initialData?.city || 'New Delhi',
-      state: initialData?.state || 'Delhi',
+      city: initialData?.city || '',
+      state: initialData?.state || '',
       type: initialData?.type || 'Home',
       isDefault: initialData?.isDefault ?? true,
     },
@@ -59,8 +59,8 @@ export const AddressFormModal: React.FC<AddressFormModalProps> = ({
 
   const selectedType = watch('type');
 
-  const onSubmit = (data: AddressFormValues) => {
-    onSave({
+  const onSubmit = async (data: AddressFormValues) => {
+    await onSave({
       ...data,
       addressLine2: data.addressLine2 || '',
       landmark: data.landmark || '',

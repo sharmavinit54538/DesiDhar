@@ -17,10 +17,16 @@ interface CartState {
   applyCoupon: (coupon: Coupon) => void;
   removeCoupon: () => void;
   clearCart: () => void;
+  reconcileWithServer: (lines: CartItem[]) => void;
 
   // Calculations
   getItemCount: () => number;
-  getPricing: () => OrderPricing;
+  /**
+   * Local estimate used for compact UI (navbar badge, cart summary before the
+   * server responds). Delivery and coupon rules come from `/api/settings` and
+   * `/api/cart/validate`; nothing here invents a threshold or fee.
+   */
+  getPricing: (delivery?: { freeDeliveryThreshold: number; deliveryFee: number }) => OrderPricing;
 }
 
 export const useCartStore = create<CartState>()(
@@ -123,11 +129,39 @@ export const useCartStore = create<CartState>()(
         set({ items: [], appliedCoupon: null });
       },
 
+      /**
+       * Replaces locally cached price/stock/image data with the authoritative values
+       * returned by POST /api/cart/validate. Line identity and quantities are kept.
+       */
+      reconcileWithServer: (lines: CartItem[]) => {
+        set((state) => ({
+          items: state.items.map((item) => {
+            const serverLine = lines.find((line) => line.variantId === item.variantId);
+            if (!serverLine) return item;
+            return {
+              ...item,
+              price: serverLine.price,
+              mrp: serverLine.mrp,
+              maxStock: serverLine.maxStock,
+              image: serverLine.image,
+              name: serverLine.name,
+              slug: serverLine.slug,
+              brand: serverLine.brand,
+              weight: serverLine.weight,
+              quantity:
+                serverLine.maxStock > 0
+                  ? Math.min(item.quantity, serverLine.maxStock)
+                  : item.quantity,
+            };
+          }),
+        }));
+      },
+
       getItemCount: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
 
-      getPricing: (): OrderPricing => {
+      getPricing: (delivery): OrderPricing => {
         const { items, appliedCoupon } = get();
 
         let mrpTotal = 0;
@@ -140,8 +174,12 @@ export const useCartStore = create<CartState>()(
 
         const productDiscount = mrpTotal - itemTotal;
 
-        // Delivery fee: Free above ₹499, otherwise ₹40
-        const deliveryFee = itemTotal === 0 || itemTotal >= 499 ? 0 : 40;
+        // Delivery rules are configuration, not business logic: use the values
+        // published by GET /api/settings and never assume a threshold.
+        let deliveryFee = 0;
+        if (delivery && itemTotal > 0) {
+          deliveryFee = itemTotal >= delivery.freeDeliveryThreshold ? 0 : delivery.deliveryFee;
+        }
 
         let couponDiscount = 0;
         if (appliedCoupon && itemTotal >= appliedCoupon.minOrderValue) {

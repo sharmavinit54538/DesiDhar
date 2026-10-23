@@ -1,5 +1,6 @@
 import React from 'react';
 import type { OrderTimelineItem } from '../../types';
+import { formatDateTime } from '../../utils/formatters';
 import { Check, Clock, Package, Truck, Home, XCircle } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -11,6 +12,8 @@ interface OrderTimelineProps {
 export const OrderTimeline: React.FC<OrderTimelineProps> = ({ timeline, isCancelled }) => {
   const getIcon = (status: string) => {
     switch (status) {
+      case 'PENDING_PAYMENT':
+        return Clock;
       case 'PLACED':
         return Clock;
       case 'PACKED':
@@ -70,7 +73,7 @@ export const OrderTimeline: React.FC<OrderTimelineProps> = ({ timeline, isCancel
                     {item.title}
                   </h4>
                   <span className="text-[11px] font-mono text-stone-400">
-                    {item.time}
+                    {item.time ? formatDateTime(item.time) : ''}
                   </span>
                 </div>
 

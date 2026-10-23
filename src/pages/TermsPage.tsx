@@ -1,8 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
+import { useStorefront } from '../context/StorefrontContext';
 
 export const TermsPage: React.FC = () => {
+  const { settings } = useStorefront();
   const breadcrumbs = [{ label: 'Terms & Conditions' }];
 
   return (
@@ -24,7 +26,7 @@ export const TermsPage: React.FC = () => {
               Terms &amp; Conditions
             </h1>
             <p className="text-xs text-stone-400 mt-1">
-              Effective: October 2026 • DesiDhar Agrifoods Pvt. Ltd.
+              Effective: October 2026{settings?.companyName ? ` • ${settings.companyName}` : ''}
             </p>
           </div>
 
@@ -42,7 +44,9 @@ export const TermsPage: React.FC = () => {
               2. Product Quality &amp; Natural Variations
             </h2>
             <p>
-              Because our dairy products are 100% natural and unadulterated without chemical dyes or synthetic emulsifiers, slight seasonal variations in cow milk color (beta-carotene tint) or ghee grain size (temperature crystallization) are authentic signs of natural purity.
+              Ingredients are declared on each product page. Natural products can vary slightly in
+              colour and texture between batches, and pack instructions should be followed for
+              storage and use.
             </p>
           </section>
 
@@ -51,7 +55,9 @@ export const TermsPage: React.FC = () => {
               3. Pricing, Payments &amp; Delivery Slots
             </h2>
             <p>
-              All prices are listed in Indian Rupees (₹) inclusive of applicable GST. We reserve the right to modify delivery slot availability based on morning weather conditions and local cold-chain vehicle logistics.
+              Prices are listed in Indian Rupees and are recalculated on the server when an order is
+              placed. Delivery slot availability can change based on the kitchen cut-off and
+              logistics capacity; the slots offered at checkout are the ones available.
             </p>
           </section>
 
@@ -60,7 +66,7 @@ export const TermsPage: React.FC = () => {
               4. Governing Law
             </h2>
             <p>
-              These terms shall be governed by and construed in accordance with the laws of the Republic of India, with exclusive jurisdiction in the courts of New Delhi.
+              These terms are governed by the laws of the Republic of India.
             </p>
           </section>
         </div>

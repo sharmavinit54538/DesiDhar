@@ -28,13 +28,15 @@ type OtpFormValues = z.infer<typeof otpSchema>;
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, authModalInitialPhone, addToast } =
     useUiStore();
-  const { login } = useAuthStore();
+  const { setSessionUser } = useAuthStore();
 
   const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [phoneSubmitted, setPhoneSubmitted] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
   const [apiError, setApiError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [devCode, setDevCode] = useState<string | null>(null);
+  const [deliveryChannel, setDeliveryChannel] = useState<string>('');
 
   const phoneForm = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
@@ -79,16 +81,16 @@ export const AuthModal: React.FC = () => {
     setIsSubmitting(true);
     try {
       const res = await api.sendOtp(data.phone);
-      if (res.success) {
-        setPhoneSubmitted(data.phone);
-        setStep('OTP');
-        setResendTimer(30);
-        addToast(res.message, 'info');
-      } else {
-        setApiError(res.message);
-      }
-    } catch {
-      setApiError('Unable to send OTP. Please try again.');
+      setPhoneSubmitted(data.phone);
+      setStep('OTP');
+      setResendTimer(30);
+      setDevCode(res.devMode && res.devCode ? res.devCode : null);
+      setDeliveryChannel(res.devMode ? 'console' : 'sms');
+      addToast(res.message, 'info');
+    } catch (error) {
+      setApiError(
+        error instanceof Error ? error.message : 'Unable to send the verification code.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -100,14 +102,17 @@ export const AuthModal: React.FC = () => {
     try {
       const res = await api.verifyOtp(phoneSubmitted, data.otp);
       if (res.success && res.user) {
-        login(res.user);
-        addToast(`Welcome back, ${res.user.name}!`, 'success');
+        await setSessionUser(res.user);
+        addToast(
+          res.user.name ? `Welcome, ${res.user.name}!` : 'Signed in successfully.',
+          'success'
+        );
         closeAuthModal();
       } else {
-        setApiError(res.error || 'Invalid OTP code.');
+        setApiError('Verification failed. Request a new code to continue.');
       }
-    } catch {
-      setApiError('Verification failed. Try again.');
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'Verification failed.');
     } finally {
       setIsSubmitting(false);
     }
@@ -116,11 +121,13 @@ export const AuthModal: React.FC = () => {
   const handleResend = async () => {
     if (resendTimer > 0) return;
     try {
-      await api.sendOtp(phoneSubmitted);
+      const res = await api.sendOtp(phoneSubmitted);
       setResendTimer(30);
-      addToast('New OTP sent to your phone!', 'info');
-    } catch {
-      setApiError('Could not resend OTP.');
+      setDevCode(res.devMode && res.devCode ? res.devCode : null);
+      setDeliveryChannel(res.devMode ? 'console' : 'sms');
+      addToast(res.message, 'info');
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : 'Could not resend the code.');
     }
   };
 
@@ -220,13 +227,16 @@ export const AuthModal: React.FC = () => {
             </p>
           </div>
 
-          {/* Demo hint alert */}
-          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>
-              <strong>Demo Mode:</strong> You can enter <strong>any 6 digits</strong> (e.g. 123456) to proceed!
-            </span>
-          </div>
+          {devCode && (
+            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Development mode</strong> ({deliveryChannel} delivery): the server issued the
+                code <strong className="font-mono tracking-widest">{devCode}</strong>. Configure an SMS
+                provider to send real codes.
+              </span>
+            </div>
+          )}
 
           <div>
             <label

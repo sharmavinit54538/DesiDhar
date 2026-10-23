@@ -21,6 +21,8 @@ export const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   className,
 }) => {
+  const touchStartY = React.useRef<number | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -50,8 +52,6 @@ export const Modal: React.FC<ModalProps> = ({
     xl: 'max-w-xl',
     '2xl': 'max-w-2xl',
   };
-
-  const touchStartY = React.useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;

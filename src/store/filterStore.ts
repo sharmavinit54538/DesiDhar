@@ -19,7 +19,7 @@ interface FilterStoreState {
 
 const initialFilters: FilterState = {
   category: undefined,
-  priceRange: [0, 8000],
+  priceRange: [0, 100000],
   brands: [],
   weights: [],
   minRating: 0,
@@ -124,7 +124,7 @@ export const useFilterStore = create<FilterStoreState>((set, get) => ({
     if (f.minDiscount > 0) count += 1;
     if (f.dietary.length > 0) count += f.dietary.length;
     if (f.inStockOnly) count += 1;
-    if (f.priceRange[0] > 0 || f.priceRange[1] < 8000) count += 1;
+    if (f.priceRange[0] > 0 || f.priceRange[1] < 100000) count += 1;
     return count;
   },
 }));

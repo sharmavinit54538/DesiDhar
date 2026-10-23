@@ -2,22 +2,24 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { ChevronDown, HelpCircle, Search } from 'lucide-react';
+import { useStorefront } from '../context/StorefrontContext';
+import { formatINR } from '../utils/formatters';
 
-const FAQ_CATEGORIES = [
+const buildFaqCategories = (threshold: number | null, fee: number | null) => [
   {
     category: 'Daily Morning Milk & Cold-Chain',
     items: [
       {
-        q: 'What time is milk delivered in the morning?',
-        a: 'Our early morning milk runs occur between 5:30 AM and 7:30 AM, ensuring your fresh milk arrives well before breakfast and school routines. Orders placed before 9:00 PM are dispatched for next-morning delivery.',
+        q: 'When will my order be delivered?',
+        a: 'Delivery windows are generated from the kitchen\u2019s daily cut-off and shown at checkout for your pincode. Pick the slot that suits you before confirming the order.',
       },
       {
-        q: 'How does the cold-chain packaging work?',
-        a: 'All fresh milk, paneer, and curd are packed inside high-density food-grade insulated bags fitted with sub-zero reusable refrigerant gel pads. This maintains temperatures below 4°C for up to 3 hours even if left at your doorstep.',
+        q: 'How are dairy items packed?',
+        a: 'Fresh items are packed in insulated carriers for the selected delivery window. Please refrigerate them as soon as they arrive.',
       },
       {
-        q: 'Should I boil DesiDhar milk immediately upon arrival?',
-        a: 'Yes, because our Raw Farm Milk contains live natural microflora without chemical preservatives, we recommend bringing it to a rolling boil within 2 hours of delivery and then refrigerating.',
+        q: 'How should I store milk after delivery?',
+        a: 'Refrigerate milk immediately. If a product needs boiling before use, the pack and the product page will say so.',
       },
     ],
   },
@@ -25,8 +27,8 @@ const FAQ_CATEGORIES = [
     category: 'Vedic Bilona Ghee & Authenticity',
     items: [
       {
-        q: 'How is Bilona Ghee different from commercial ghee?',
-        a: 'Commercial ghee is made by skimming industrial cream and boiling it quickly. Authentic Bilona Ghee requires whole milk to be converted into curd, hand-churned bidirectionally with a wooden churner (Bilona) to separate cultured butter (Makkhan), which is then slow-simmered over gentle flame. It takes 25 to 30 liters of A2 cow milk to yield just 1 liter of Bilona Ghee!',
+        q: 'How is Bilona ghee made?',
+        a: 'Bilona ghee is churned from whole curd using a wooden churner and then simmered slowly. The exact milk-to-ghee yield depends on the batch; ask customer care if you need details for a specific product.',
       },
       {
         q: 'Why does DesiDhar Ghee have a granular (Danedaar) texture?',
@@ -38,12 +40,12 @@ const FAQ_CATEGORIES = [
     category: 'Sweets, Mithai & Shelf Life',
     items: [
       {
-        q: 'Do you use silver foil (Vark) on Kaju Katli?',
-        a: 'No. We strictly prohibit silver vark on our sweets due to widespread industrial adulteration and animal tissue contamination in commercial vark production. We offer pristine, pure cashew sweets.',
+        q: 'Do your sweets use silver foil (vark)?',
+        a: 'Each sweet\u2019s ingredient list is published on its product page and names any silver leaf used. If it is not listed there, it is not part of the recipe.',
       },
       {
-        q: 'How long do Shuddh Ghee sweets remain fresh?',
-        a: 'Our dry sweets like Kaju Katli, Besan Ladoo, and Soan Papdi have a shelf life of 25 to 30 days stored in an airtight box at room temperature. Milk sweets like Rasmalai and Gulab Jamun should be kept refrigerated and consumed within 4 to 10 days.',
+        q: 'How long do sweets stay fresh?',
+        a: 'Shelf life is listed on each product page and on the pack. Storage instructions differ between dry sweets and milk-based sweets.',
       },
     ],
   },
@@ -51,18 +53,25 @@ const FAQ_CATEGORIES = [
     category: 'Orders, Subscriptions & Delivery',
     items: [
       {
-        q: 'What is the minimum order for free delivery?',
-        a: 'All orders of ₹499 or above qualify for 100% FREE temperature-controlled cold delivery. For orders below ₹499, a nominal ₹40 insulated logistics fee applies.',
+        q: 'What are the delivery charges?',
+        a: threshold && fee
+          ? `Delivery is free on orders of ${formatINR(threshold)} or more. Below that, a delivery fee of ${formatINR(fee)} applies.`
+          : 'Delivery charges are confirmed at checkout.',
       },
       {
-        q: 'Can I cancel or reschedule my delivery slot?',
-        a: 'Yes! You can cancel or reschedule any upcoming morning order directly through the My Orders tab up until 9:00 PM the previous evening.',
+        q: 'Can I cancel my order?',
+        a: 'Orders can be cancelled from My Orders while they are still in the placed or packed stage. Once dispatched they can no longer be cancelled.',
       },
     ],
   },
 ];
 
 export const FaqPage: React.FC = () => {
+  const { settings } = useStorefront();
+  const faqCategories = buildFaqCategories(
+    settings?.freeDeliveryThreshold ?? null,
+    settings?.deliveryFee ?? null
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
     '0-0': true,
@@ -114,7 +123,7 @@ export const FaqPage: React.FC = () => {
 
         {/* FAQ list */}
         <div className="space-y-8">
-          {FAQ_CATEGORIES.map((cat, catIdx) => {
+          {faqCategories.map((cat, catIdx) => {
             const filteredItems = cat.items.filter(
               (item) =>
                 item.q.toLowerCase().includes(searchTerm.toLowerCase()) ||
